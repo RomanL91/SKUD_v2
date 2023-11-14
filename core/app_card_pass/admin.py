@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from app_card_pass.models import CardPass
+
+
+@admin.register(CardPass)
+class CardPassAdmin(admin.ModelAdmin):
+    pass
