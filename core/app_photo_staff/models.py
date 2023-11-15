@@ -24,3 +24,4 @@ class StaffPhoto(models.Model):
 
     def __str__(self) -> str:
         return self.staff.last_name
+    

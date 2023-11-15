@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from app_staffs.models import Staff
 from app_card_pass.models import CardPass
+from app_photo_staff.models import StaffPhoto
 
 
 class CardPassInlines(admin.StackedInline):
@@ -10,9 +11,15 @@ class CardPassInlines(admin.StackedInline):
     classes = ['collapse']
 
 
+class StaffPhotoInlines(admin.StackedInline):
+    model = StaffPhoto
+    extra = 0
+    classes = ['collapse']
+
+
 @admin.register(Staff)
 class StaffAdmin(admin.ModelAdmin):
-    inlines = [CardPassInlines,]
+    inlines = [CardPassInlines, StaffPhotoInlines]
 
 
     def save_related(self, request, form, formsets, change):
@@ -21,6 +28,11 @@ class StaffAdmin(admin.ModelAdmin):
         form.save_m2m()
         for formset in formsets:
             instances = formset.save(commit=False)
-            for instance in instances:
-                instance.formatting_in_hex
+            try:
+                obj = instances[0]
+                if isinstance(obj, CardPass):
+                    for instance in instances:
+                        instance.formatting_in_hex
+            except IndexError:
+                pass
             self.save_formset(request, form, formset, change=change)
