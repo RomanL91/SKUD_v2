@@ -5,4 +5,6 @@ from app_card_pass.models import CardPass
 
 @admin.register(CardPass)
 class CardPassAdmin(admin.ModelAdmin):
-    pass
+    
+    def save_model(self, request, obj, form, change):
+        obj.formatting_in_hex
