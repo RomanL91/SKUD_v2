@@ -12,14 +12,6 @@ class Staff(models.Model):
     last_name = models.CharField(verbose_name='Фамилия', max_length=150)
     patromic = models.CharField(verbose_name='Отчество', max_length=150, blank=True)
 
-    # --Данные о номере пропуска
-    # pass_card_dec_format = models.CharField(
-    #     verbose_name='Номер пропуска в DEC формате', max_length=10, unique=True
-    # )
-    # pass_cart_hex_format = models.CharField(
-    #     verbose_name='Номер пропуска в HEX формате', max_length=10, unique=True
-    # )
-
     # --Фото
     # ФОТО(много - 3 к примеру)
     # Пропускать без проверки биометриии
