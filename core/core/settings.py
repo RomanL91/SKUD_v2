@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'app_staffs',
     'app_card_pass',
+    'app_photo_staff',
 ]
 
 MIDDLEWARE = [
