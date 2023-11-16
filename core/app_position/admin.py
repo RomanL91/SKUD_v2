@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from app_position.models import Position
+
+
+@admin.register(Position)
+class PositionAdmin(admin.ModelAdmin):
+    filter_horizontal = ['tag',]
