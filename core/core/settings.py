@@ -125,3 +125,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# =============================MY_ADDING=======================================
+import os
+
+
+MEDIA_URL = '/media/'
+print(f'BASE_DIR ----------------- {BASE_DIR}')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+print(f'MEDIA_ROOT ----------------- {MEDIA_ROOT}')
+
+TIME_ZONE = 'Asia/Omsk' 
+USE_TZ = True
