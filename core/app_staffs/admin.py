@@ -16,7 +16,7 @@ class StaffAdmin(admin.ModelAdmin):
         'get_photo_staff', 'first_name', 'last_name', 'patromic', 
         'interception',
     ]
-
+    filter_horizontal = ['tag',]
     inlines = [CardPassInlines, StaffPhotoInlines]
 
 

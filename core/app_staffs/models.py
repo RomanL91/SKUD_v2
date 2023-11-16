@@ -1,5 +1,7 @@
 from django.db import models
 
+from app_tag.models import Tags
+
 from django.core.validators import RegexValidator
 
 
@@ -32,7 +34,13 @@ class Staff(models.Model):
     )
 
     # --Спец теги для группировки сотрудников по какому либо признаку
-    # теги
+    tag = models.ManyToManyField(
+        Tags, verbose_name='ТЕГ', 
+        help_text='''
+        Выбирите/добавьте уникальный Тег для сотрудника для создание особых групп сотрудников.
+        Добавляйте сотруднику сколько угодно Тегов, включая его в разные группы.
+        ''',
+        blank=True)
     
     # --Информация о рабочем статусе
     # департамент
