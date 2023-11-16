@@ -48,7 +48,8 @@ class Staff(models.Model):
     # должность
     position = models.ForeignKey(
         Position, on_delete=models.CASCADE,
-        verbose_name='Долность'
+        verbose_name='Долность', blank=True, null=True,
+        help_text='fffffff'
     )
     # график сотрудника
 

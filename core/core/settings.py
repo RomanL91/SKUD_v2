@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'ajax_select', 
+
     'app_staffs',
     'app_card_pass',
     'app_photo_staff',
