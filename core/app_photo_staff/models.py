@@ -13,7 +13,7 @@ def get_path_file(instance, filename):
 
 
 class StaffPhoto(models.Model):
-    photo = models.ImageField(verbose_name='Фотография', blank=True, upload_to=get_path_file)
+    photo = models.ImageField(verbose_name='Фотография', blank=False, upload_to=get_path_file)
     desc = models.TextField(verbose_name='Описание', max_length=1500, blank=True)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE, verbose_name='Сотрудник')
 

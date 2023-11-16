@@ -131,9 +131,9 @@ import os
 
 
 MEDIA_URL = '/media/'
-print(f'BASE_DIR ----------------- {BASE_DIR}')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
-print(f'MEDIA_ROOT ----------------- {MEDIA_ROOT}')
+
+NO_PROFILE_PHOTO = os.path.join(MEDIA_URL, 'siluet.jpg') #/home/romanl/SKUD_v2/core/media/siluet.jpg
 
 TIME_ZONE = 'Asia/Omsk' 
 USE_TZ = True

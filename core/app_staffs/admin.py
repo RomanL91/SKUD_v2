@@ -1,24 +1,22 @@
 from django.contrib import admin
 
+from django.conf import settings
+from django.utils.html import mark_safe
+
 from app_staffs.models import Staff
 from app_card_pass.models import CardPass
-from app_photo_staff.models import StaffPhoto
 
-
-class CardPassInlines(admin.StackedInline):
-    model = CardPass
-    extra = 0
-    classes = ['collapse']
-
-
-class StaffPhotoInlines(admin.StackedInline):
-    model = StaffPhoto
-    extra = 0
-    classes = ['collapse']
+from app_card_pass.admin import CardPassInlines
+from app_photo_staff.admin import StaffPhotoInlines
 
 
 @admin.register(Staff)
 class StaffAdmin(admin.ModelAdmin):
+    list_display = [
+        'get_photo_staff', 'first_name', 'last_name', 'patromic', 
+        'interception',
+    ]
+
     inlines = [CardPassInlines, StaffPhotoInlines]
 
 
@@ -36,3 +34,12 @@ class StaffAdmin(admin.ModelAdmin):
             except IndexError:
                 pass
             self.save_formset(request, form, formset, change=change)
+
+    
+    def get_photo_staff(self, obj):
+        try:
+            url_prod = obj.staffphoto_set.all()[0].photo.url
+            return mark_safe(f'<img src={url_prod} width="75"')
+        except IndexError:
+            return mark_safe(f'<img src={settings.NO_PROFILE_PHOTO} width="75"')
+    get_photo_staff.short_description = 'ФОТО'
