@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'app_tag',
     'app_position',
     'app_departament',
+    'app_controller',
 ]
 
 MIDDLEWARE = [
