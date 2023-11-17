@@ -19,7 +19,7 @@ class StaffAdmin(admin.ModelAdmin):
         'interception',
     ]
     filter_horizontal = ['tag',]
-    autocomplete_fields = ['position',]
+    autocomplete_fields = ['position', 'departament']
     inlines = [CardPassInlines, StaffPhotoInlines]
 
 

@@ -2,6 +2,7 @@ from django.db import models
 
 from app_tag.models import Tags
 from app_position.models import Position
+from app_departament.models import Departament
 
 from django.core.validators import RegexValidator
 
@@ -46,6 +47,10 @@ class Staff(models.Model):
     # --Информация о рабочем статусе
     # департамент
     # должность
+    departament = models.ForeignKey(
+        Departament, on_delete=models.CASCADE,
+        verbose_name='Департамент', blank=True, null=True
+    )
     position = models.ForeignKey(
         Position, on_delete=models.CASCADE,
         verbose_name='Долность', blank=True, null=True,
