@@ -40,17 +40,6 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
-name = "django-ajax-selects"
-version = "2.2.0"
-description = "Edit ForeignKey, ManyToManyField and CharField in Django Admin using jQuery UI AutoComplete."
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "django-ajax-selects-2.2.0.tar.gz", hash = "sha256:539298874b2d26ce9e778a5173d312f55340c887a126c7e2d3460b9a5b4593a2"},
-]
-
-[[package]]
 name = "pillow"
 version = "10.1.0"
 description = "Python Imaging Library (Fork)"
@@ -162,4 +151,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "ebb14fe96c0dffbe4a25bcd068b935f2d4a971b8fc5f71786dc15732cfe73c3a"
+content-hash = "089b880af78b2f4aa6f433c262c88a1937505c0eef05d7ff2d989d754dceded6"

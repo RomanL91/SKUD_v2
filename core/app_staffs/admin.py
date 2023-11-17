@@ -9,7 +9,7 @@ from app_card_pass.models import CardPass
 from app_card_pass.admin import CardPassInlines
 from app_photo_staff.admin import StaffPhotoInlines
 
-from app_staffs.lookups import StaffModelForm
+# from app_staffs.lookups import StaffModelForm
 
 
 @admin.register(Staff)
@@ -19,8 +19,8 @@ class StaffAdmin(admin.ModelAdmin):
         'interception',
     ]
     filter_horizontal = ['tag',]
+    autocomplete_fields = ['position',]
     inlines = [CardPassInlines, StaffPhotoInlines]
-    form = StaffModelForm
 
 
     def save_related(self, request, form, formsets, change):
