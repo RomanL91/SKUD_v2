@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from app_departament.models import Departament
+
+
+@admin.register(Departament)
+class DepartamentAdmin(admin.ModelAdmin):
+    pass
