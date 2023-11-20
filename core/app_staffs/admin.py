@@ -14,6 +14,9 @@ from app_photo_staff.admin import StaffPhotoInlines
 
 @admin.register(Staff)
 class StaffAdmin(admin.ModelAdmin):
+    readonly_fields = [
+        'preview_photo_staff',
+    ]
     list_display = [
         'get_photo_staff', 'first_name', 'last_name', 'patromic', 
         'interception',
@@ -38,11 +41,17 @@ class StaffAdmin(admin.ModelAdmin):
                 pass
             self.save_formset(request, form, formset, change=change)
 
+
+    def preview_photo_staff(self, obj):
+        url_photo = obj.staffphoto_set.all()[0].photo.url
+        return mark_safe(f'<img src={url_photo} width="300" ')
+    preview_photo_staff.short_description = 'ФОТО'
+
     
     def get_photo_staff(self, obj):
         try:
-            url_prod = obj.staffphoto_set.all()[0].photo.url
-            return mark_safe(f'<img src={url_prod} width="75"')
+            url_photo = obj.staffphoto_set.all()[0].photo.url
+            return mark_safe(f'<img src={url_photo} width="75"')
         except IndexError:
             return mark_safe(f'<img src={settings.NO_PROFILE_PHOTO} width="75"')
     get_photo_staff.short_description = 'ФОТО'
