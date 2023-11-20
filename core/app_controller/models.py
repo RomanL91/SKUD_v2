@@ -1,5 +1,7 @@
 from django.db import models
 
+from app_checkpoint.models import Checkpoint
+
 
 class Controller(models.Model):
     name_controller = models.CharField(
@@ -40,7 +42,15 @@ class Controller(models.Model):
         '''
     )
     controller_online = models.CharField(
-        verbose_name='Режимы контроллера', max_length=10, default=(0, 0)
+        verbose_name='Режимы контроллера', max_length=10, default='0/0'
+    )
+    checkpoint = models.ForeignKey(
+        Checkpoint, on_delete=models.CASCADE, 
+        verbose_name='Проходная', blank=True,
+        help_text='''Выберите проходную, к которой приявяжете контроллер.<br>
+        Контроллер без выбранной проходной не учавствует в логике программы.<br>
+        События с такого контроллера не сохраняются в системе и полностью игнорируются.
+        '''
     )
 
 
@@ -51,9 +61,3 @@ class Controller(models.Model):
 
     def __str__(self) -> str:
         return self.name_controller
-
-    # проходная
-    # активность (вкл\выкл)
-    # режимы онлайн
-    # режимы работы
-    # 

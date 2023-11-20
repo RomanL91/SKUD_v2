@@ -3,8 +3,6 @@ from django.contrib import admin
 from app_controller.models import Controller
 from app_controller.forms import ControllerAdminForm
 
-from django.utils.html import mark_safe
-
 
 @admin.register(Controller)
 class ControllerAdmin(admin.ModelAdmin):
