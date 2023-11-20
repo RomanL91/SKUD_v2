@@ -3,6 +3,7 @@ from django.db import models
 from app_tag.models import Tags
 from app_position.models import Position
 from app_departament.models import Departament
+from app_access_profile.models import AccessProfile
 
 from django.core.validators import RegexValidator
 
@@ -30,6 +31,10 @@ class Staff(models.Model):
     # --Доступ к территории
     # профиль доступа
     # перехват
+    access_profile = models.ForeignKey(
+        AccessProfile, on_delete=models.CASCADE,
+        verbose_name='Профиль доступа', 
+    )
     interception = models.BooleanField(
         verbose_name='Перехват', default=False,
         help_text='Ограничит доступ на всех проходных/контроллерах'

@@ -11,3 +11,4 @@ class AccessProfilrAdmin(admin.ModelAdmin):
     filter_horizontal = [
         'checpoint',
     ]
+    search_fields = ['name_access_profile',]
