@@ -1,5 +1,7 @@
 from django.db import models
 
+from app_checkpoint.models import Checkpoint
+
 
 class AccessProfile(models.Model):
     name_access_profile = models.CharField(
@@ -20,6 +22,12 @@ class AccessProfile(models.Model):
         не смогут пользоваться своими пропусками на проходных.<br>
         Их пропуска будут стерты из контроллеров, а проходные для них станут не доступны!<br>
         Использовать при явной необходимости, для перехвата большого колличества сотрудников!
+        '''
+    )
+    checpoint = models.ManyToManyField(
+        Checkpoint, verbose_name='Проходные',
+        help_text='''
+        Выбирите проходные, куда данный профиль доступа будет иметь доступ.
         '''
     )
 
