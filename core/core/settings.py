@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'app_departament',
     'app_controller',
     'app_checkpoint',
+    'app_access_profile',
 ]
 
 MIDDLEWARE = [
