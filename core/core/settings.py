@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'app_position',
     'app_departament',
     'app_controller',
+    'app_checkpoint',
 ]
 
 MIDDLEWARE = [
