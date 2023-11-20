@@ -11,3 +11,4 @@ class ControllerAdmin(admin.ModelAdmin):
         'name_controller', 'serial_number', 'controller_activity', 
         'controller_online', 'ip_adress', 'manual_control', 
     ]
+    autocomplete_fields = ['checkpoint',]
