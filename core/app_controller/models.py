@@ -3,7 +3,7 @@ from django.db import models
 
 class Controller(models.Model):
     name_controller = models.CharField(
-        verbose_name='Имя контроллера', max_length=200,
+        verbose_name='Имя контроллера', max_length=200, unique=True,
         help_text='''
         Дайте контроллеру обдуманное и рациональное имя,<br>
         которое ВЫ будете дальше использовать в системе в целом.<br>
@@ -40,7 +40,18 @@ class Controller(models.Model):
         '''
     )
     controller_online = models.CharField(
-        verbose_name='Режимы контроллера', max_length=10, default='0')
+        verbose_name='Режимы контроллера', max_length=10, default=(0, 0)
+    )
+
+
+    class Meta:
+        verbose_name = 'Контроллер'
+        verbose_name_plural = 'Контроллеры'
+
+
+    def __str__(self) -> str:
+        return self.name_controller
+
     # проходная
     # активность (вкл\выкл)
     # режимы онлайн
