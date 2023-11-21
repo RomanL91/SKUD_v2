@@ -62,7 +62,6 @@ class Day(models.Model):
     break_in_schedule_end = models.TimeField(
         choices=get_time_choices(), verbose_name='Конец перерыва', blank=True, null=True,)
     
-
     day_time_start =  models.TimeField(
         choices=get_time_choices(), verbose_name=ver_name_start_d, blank=True, null=True,)
     day_time_end =  models.TimeField(
@@ -77,6 +76,12 @@ class Day(models.Model):
     class Meta:
         verbose_name = 'День'
         verbose_name_plural = 'Дни'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('week_day', 'schedule',), 
+                name='%(app_label)s_%(class)s_week_day_schedule'
+            ),
+        )
 
 
     def __str__(self) -> str:
