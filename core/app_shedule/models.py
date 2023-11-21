@@ -22,7 +22,39 @@ class Schedule(models.Model):
     desc_schedule = models.TextField(
         verbose_name='Описание расписания', blank=True
     )
-    monday_time_stert =  models.TimeField(
+    type_schedule = models.CharField(
+        verbose_name='Тип расписания', max_length=100,
+        help_text='''
+        Выберите тип расписания.<br>
+        Расписание может быть создано как для Сотрудника, так и для Профиля доступа,<br>
+        а так же и для Проходной. Это дает еще один уровень контроля. Например:<br>
+        созданное расписание для сотрудников будет опещать дежурного/охрану/вахтера<br>
+        о времени действия сотрудника, скажем, сто последний зашел с опозданием или вне графика.<br>
+        Создав и добавив расписание для проходной, пост будет информирован о том,<br>
+        что событие было совершено согласно расписанию проходной или вне расписания.<br>
+        '''
+    )
+    strict_schedule = models.BooleanField(
+        verbose_name='Строгое расписание', default=False,
+        help_text='''
+        Данный параметр можно применить только к расписанию проходных.<br>
+        Если расписание проходной строгое, то проходная будет отказывать в доступе<br>
+        при событиях совершенных на ней вне расписания.<br>
+        '''
+    )
+    
+
+class Day(models.Model):
+    week_day = models.CharField(
+    verbose_name='День недели', max_length=20, default=1)
+
+    break_in_schedule_start = models.TimeField(
+        choices=get_time_choices(), verbose_name='Начало перерыва', blank=True, null=True,)
+    break_in_schedule_end = models.TimeField(
+        choices=get_time_choices(), verbose_name='Конец перерыва', blank=True, null=True,)
+    
+
+    monday_time_start =  models.TimeField(
         choices=get_time_choices(), verbose_name=ver_name_start_d, blank=True, null=True,)
     monday_time_end =  models.TimeField(
         choices=get_time_choices(), verbose_name=ver_name_end_d, blank=True, null=True,)

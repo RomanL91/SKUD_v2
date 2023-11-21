@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'app_controller',
     'app_checkpoint',
     'app_access_profile',
+    'app_shedule',
 ]
 
 MIDDLEWARE = [
