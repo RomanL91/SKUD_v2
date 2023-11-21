@@ -1,3 +1,13 @@
 from django.contrib import admin
 
-# Register your models here.
+from app_shedule.models import Schedule, Day
+
+
+@admin.register(Schedule)
+class ScheduleAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Day)
+class DayAdmin(admin.ModelAdmin):
+    pass

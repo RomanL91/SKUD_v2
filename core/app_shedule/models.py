@@ -42,6 +42,15 @@ class Schedule(models.Model):
         при событиях совершенных на ней вне расписания.<br>
         '''
     )
+
+
+    class Meta:
+        verbose_name = 'Расписание'
+        verbose_name_plural = 'Расписания'
+
+
+    def __str__(self) -> str:
+        return self.name_schedule
     
 
 class Day(models.Model):
@@ -91,9 +100,9 @@ class Day(models.Model):
 
 
     class Meta:
-        verbose_name = 'Расписание'
-        verbose_name_plural = 'Расписания'
+        verbose_name = 'День'
+        verbose_name_plural = 'Дни'
 
 
     def __str__(self) -> str:
-        return self.name_schedule
+        return self.week_day
