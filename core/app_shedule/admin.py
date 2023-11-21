@@ -25,6 +25,10 @@ class ScheduleAdmin(admin.ModelAdmin):
     ]
     form = ScheduleAdminForm
     inlines = [DayInline,]
+    fieldsets = (
+        (None, {'fields': ('name_schedule', 'desc_schedule')}),
+        ('Тип расписания', {'fields': (('type_schedule', 'strict_schedule'),),}),
+    )
 
 
 @admin.register(Day)
@@ -36,3 +40,8 @@ class DayAdmin(admin.ModelAdmin):
         'schedule'
     ]
     form = DayAdminForm
+    fieldsets = (
+        (None, {'fields': ('week_day', 'schedule')}),
+        ('Начало и конец рабочего дня', {'fields': (('day_time_start', 'day_time_end'),),}),
+        ('Начало и конец перерыва', {'fields': (('break_in_schedule_start', 'break_in_schedule_end'),),}),
+    )

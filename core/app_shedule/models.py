@@ -6,7 +6,7 @@ from datetime import datetime, time, date, timedelta
 ver_name_start_d = 'начало рабочего дня'
 ver_name_end_d = 'конец рабочего дня'
 
-def get_time_choices(start_time=time(0,0,0), end_time=time(23,0,0), delta=timedelta(minutes=5)):
+def get_time_choices(start_time=time(0,0,0), end_time=time(23,30,0), delta=timedelta(minutes=5)):
     time_choices = ()
     time = start_time
     while time <= end_time:
@@ -55,17 +55,18 @@ class Schedule(models.Model):
 
 class Day(models.Model):
     week_day = models.CharField(
-    verbose_name='День недели', max_length=200, default=0)
+        verbose_name='День недели', max_length=200, default=0)
 
+    day_time_start =  models.TimeField(
+        choices=get_time_choices(), verbose_name=ver_name_start_d,)
+    day_time_end =  models.TimeField(
+        choices=get_time_choices(), verbose_name=ver_name_end_d,)
+    
     break_in_schedule_start = models.TimeField(
         choices=get_time_choices(), verbose_name='Начало перерыва', blank=True, null=True,)
     break_in_schedule_end = models.TimeField(
         choices=get_time_choices(), verbose_name='Конец перерыва', blank=True, null=True,)
     
-    day_time_start =  models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_start_d, blank=True, null=True,)
-    day_time_end =  models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_end_d, blank=True, null=True,)
     
     schedule = models.ForeignKey(
         Schedule, on_delete=models.CASCADE,
