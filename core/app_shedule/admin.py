@@ -20,6 +20,9 @@ class DayInline(admin.StackedInline):
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
+    search_fields = [
+        'name_schedule',
+    ]
     list_display = [
         'name_schedule', 'type_schedule', 'strict_schedule', 'desc_schedule'
     ]

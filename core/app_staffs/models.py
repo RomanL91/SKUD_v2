@@ -4,6 +4,7 @@ from app_tag.models import Tags
 from app_position.models import Position
 from app_departament.models import Departament
 from app_access_profile.models import AccessProfile
+from app_shedule.models import Schedule
 
 from django.core.validators import RegexValidator
 
@@ -12,25 +13,17 @@ phone_number_regex = RegexValidator(regex = r"^\+7\d{10}$")
 
 
 class Staff(models.Model):
-    # --Данные о сотруднике
     first_name = models.CharField(verbose_name='Имя', max_length=50)
     last_name = models.CharField(verbose_name='Фамилия', max_length=150)
     patromic = models.CharField(verbose_name='Отчество', max_length=150, blank=True)
 
-    # --Фото
-    # ФОТО(много - 3 к примеру)
-    # Пропускать без проверки биометриии
-        #опциаонально поле в зависимоти от комплектации
+    # --Доступ к территории
     without_biometric_verification = models.BooleanField(
         verbose_name='Открыть доступ без проверки биометрии',
         help_text=  '''Обладатель сможет проходить через проходные без проверки биометрии
                         на проходных где она используется''',
         blank=True, default=False, editable=True #опционально от типа поставки(сейчас отображается)
     )
-
-    # --Доступ к территории
-    # профиль доступа
-    # перехват
     access_profile = models.ForeignKey(
         AccessProfile, on_delete=models.CASCADE,
         verbose_name='Профиль доступа', 
@@ -50,15 +43,17 @@ class Staff(models.Model):
         blank=True)
     
     # --Информация о рабочем статусе
-    # департамент
-    # должность
     departament = models.ForeignKey(
         Departament, on_delete=models.CASCADE,
         verbose_name='Департамент', blank=True, null=True
     )
     position = models.ForeignKey(
         Position, on_delete=models.CASCADE,
-        verbose_name='Долность', blank=True, null=True,
+        verbose_name='Должость', blank=True, null=True,
+    )
+    schedule = models.ForeignKey(
+        Schedule, on_delete=models.CASCADE,
+        verbose_name='Расписание сотрудника', blank=True, null=True
     )
     # график сотрудника
 

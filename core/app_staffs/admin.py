@@ -22,12 +22,12 @@ class StaffAdmin(admin.ModelAdmin):
         'interception',
     ]
     filter_horizontal = ['tag',]
-    autocomplete_fields = ['position', 'departament', 'access_profile']
+    autocomplete_fields = ['position', 'departament', 'access_profile', 'schedule']
     inlines = [CardPassInlines, StaffPhotoInlines]
     fieldsets = (
         ('ФОТО', {'fields': (('preview_photo_staff', ),)}),
         ('Фамилия/Имя/Отчество', {'fields': (('first_name', 'last_name', 'patromic'),)}),
-        ('Департамент/Должность', {'fields': (('departament', 'position'),),}),
+        ('Департамент/Должность/Расписание', {'fields': (('departament', 'position', 'schedule'),),}),
         ('Управление доступом', {'fields': ('access_profile', 'without_biometric_verification', 'interception'),}),
         ('Теги/Подгруппы', {'fields': (('tag',),), 'classes':('collapse',)}),
         ('Остальное о сотруднике', {'fields': (('home_adress', 'phone_number'),), 'classes':('collapse',)}),
