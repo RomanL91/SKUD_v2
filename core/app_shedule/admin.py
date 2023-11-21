@@ -20,10 +20,19 @@ class DayInline(admin.StackedInline):
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
+    list_display = [
+        'name_schedule', 'type_schedule', 'strict_schedule', 'desc_schedule'
+    ]
     form = ScheduleAdminForm
     inlines = [DayInline,]
 
 
 @admin.register(Day)
 class DayAdmin(admin.ModelAdmin):
+    list_display = [
+        'week_day', 
+        'day_time_start', 'day_time_end', 
+        'break_in_schedule_start', 'break_in_schedule_end', 
+        'schedule'
+    ]
     form = DayAdminForm
