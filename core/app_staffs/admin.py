@@ -24,6 +24,14 @@ class StaffAdmin(admin.ModelAdmin):
     filter_horizontal = ['tag',]
     autocomplete_fields = ['position', 'departament', 'access_profile']
     inlines = [CardPassInlines, StaffPhotoInlines]
+    fieldsets = (
+        ('ФОТО', {'fields': (('preview_photo_staff', ),)}),
+        ('Фамилия/Имя/Отчество', {'fields': (('first_name', 'last_name', 'patromic'),)}),
+        ('Департамент/Должность', {'fields': (('departament', 'position'),),}),
+        ('Управление доступом', {'fields': ('access_profile', 'without_biometric_verification', 'interception'),}),
+        ('Теги/Подгруппы', {'fields': (('tag',),), 'classes':('collapse',)}),
+        ('Остальное о сотруднике', {'fields': (('home_adress', 'phone_number'),), 'classes':('collapse',)}),
+    )
 
 
     def save_related(self, request, form, formsets, change):
@@ -43,8 +51,11 @@ class StaffAdmin(admin.ModelAdmin):
 
 
     def preview_photo_staff(self, obj):
-        url_photo = obj.staffphoto_set.all()[0].photo.url
-        return mark_safe(f'<img src={url_photo} width="300" ')
+        try:
+            url_photo = obj.staffphoto_set.all()[0].photo.url
+            return mark_safe(f'<img src={url_photo} width="300" ')
+        except IndexError:
+            return mark_safe(f'<img src={settings.NO_PROFILE_PHOTO} width="300"')
     preview_photo_staff.short_description = 'ФОТО'
 
     
