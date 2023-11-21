@@ -55,7 +55,7 @@ class Schedule(models.Model):
 
 class Day(models.Model):
     week_day = models.CharField(
-    verbose_name='День недели', max_length=20, default=1)
+    verbose_name='День недели', max_length=20, default=0)
 
     break_in_schedule_start = models.TimeField(
         choices=get_time_choices(), verbose_name='Начало перерыва', blank=True, null=True,)
@@ -63,40 +63,15 @@ class Day(models.Model):
         choices=get_time_choices(), verbose_name='Конец перерыва', blank=True, null=True,)
     
 
-    monday_time_start =  models.TimeField(
+    day_time_start =  models.TimeField(
         choices=get_time_choices(), verbose_name=ver_name_start_d, blank=True, null=True,)
-    monday_time_end =  models.TimeField(
+    day_time_end =  models.TimeField(
         choices=get_time_choices(), verbose_name=ver_name_end_d, blank=True, null=True,)
     
-    tuesday_time_start =  models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_start_d, blank=True, null=True,)
-    tuesday_time_end =  models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_end_d, blank=True, null=True,)
-    
-    wednesday_time_start = models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_start_d, blank=True, null=True,)
-    wednesday_time_end = models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_end_d, blank=True, null=True,)
-    
-    thursday_time_start = models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_start_d, blank=True, null=True,)
-    thursday_time_end = models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_end_d, blank=True, null=True,)
-    
-    friday_time_start = models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_start_d, blank=True, null=True,)
-    friday_time_end = models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_end_d, blank=True, null=True,)
-    
-    saturday_time_start = models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_start_d, blank=True, null=True,)
-    saturday_time_end = models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_end_d, blank=True, null=True,)
-    
-    sunday_time_start = models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_start_d, blank=True, null=True,)
-    sunday_time_end = models.TimeField(
-        choices=get_time_choices(), verbose_name=ver_name_end_d, blank=True, null=True,)
+    schedule = models.ForeignKey(
+        Schedule, on_delete=models.CASCADE,
+        verbose_name='Расписание'
+    )
 
 
     class Meta:
