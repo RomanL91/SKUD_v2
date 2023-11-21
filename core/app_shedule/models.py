@@ -55,7 +55,7 @@ class Schedule(models.Model):
 
 class Day(models.Model):
     week_day = models.CharField(
-    verbose_name='День недели', max_length=20, default=0)
+    verbose_name='День недели', max_length=200, default=0)
 
     break_in_schedule_start = models.TimeField(
         choices=get_time_choices(), verbose_name='Начало перерыва', blank=True, null=True,)

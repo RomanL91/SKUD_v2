@@ -33,6 +33,6 @@ class DayAdminForm(forms.ModelForm):
     class Meta:
         model = Day
         widgets = {
-            "week_day": forms.RadioSelect(choices=CHOICES_WEEK_DAY),
+            "week_day": forms.Select(choices=CHOICES_WEEK_DAY),
         }
         fields = '__all__'
