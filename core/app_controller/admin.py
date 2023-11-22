@@ -8,7 +8,8 @@ from app_controller.forms import ControllerAdminForm
 class ControllerAdmin(admin.ModelAdmin):
     form = ControllerAdminForm
     list_display = [
-        'name_controller', 'serial_number', 'controller_activity', 
+        'serial_number', 'type_controller', 'name_controller',  'controller_activity', 
         'controller_online', 'ip_adress', 'manual_control', 
     ]
     autocomplete_fields = ['checkpoint',]
+    readonly_fields = ['serial_number', 'type_controller']

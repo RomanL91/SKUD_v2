@@ -46,7 +46,7 @@ class Controller(models.Model):
     )
     checkpoint = models.ForeignKey(
         Checkpoint, on_delete=models.CASCADE, 
-        verbose_name='Проходная', blank=True,
+        verbose_name='Проходная', blank=True, null=True,
         help_text='''Выберите проходную, к которой приявяжете контроллер.<br>
         Контроллер без выбранной проходной не учавствует в логике программы.<br>
         События с такого контроллера не сохраняются в системе и полностью игнорируются.
