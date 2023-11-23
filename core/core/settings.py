@@ -48,10 +48,14 @@ INSTALLED_APPS = [
     'app_checkpoint',
     'app_access_profile',
     'app_shedule',
+    'app_event',
 ]
 
 MIDDLEWARE = [
     'app_controller.ControllerMiddelware.ControllerMiddleware',
+    'app_event.EventMiddelware.EventMiddelware_2',
+    'app_event.EventMiddelware.EventMiddelware_1',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

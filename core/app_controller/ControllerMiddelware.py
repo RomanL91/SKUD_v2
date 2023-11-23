@@ -12,12 +12,11 @@ class ControllerMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
+        adapter_to_controller = BaseAdapterForModels(Controller, request)
+        trigger = adapter_to_controller.select_message(operation_type='power_on')
+        if trigger is not None:
 
-        if request.body[:19] == b'csrfmiddlewaretoken':
-            pass
-        elif request.body:
             response = JsonResponse({})
-            adapter_to_controller = BaseAdapterForModels(Controller, request)
             obj, data, created = adapter_to_controller.adapt_and_save()
             if not created:
                 status_code = adapter_to_controller.send_signal(obj.ip_adress, payload=data)
