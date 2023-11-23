@@ -53,7 +53,7 @@ class Controller(models.Model):
         '''
     )
     direction = models.CharField(
-        verbose_name='Направление', max_length=5,
+        verbose_name='Направление', max_length=30, default='0',
         help_text='''
         Установите направление контроллера.<br>
         Другими словами укажите с каной стороны находится контроллер:<br>
