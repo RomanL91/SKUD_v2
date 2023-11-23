@@ -15,11 +15,18 @@ CHOICES_CONTROLLER_ONLINE = [
     ('0/1', 'Заблокирован'),
 ]
 
+CHOICES_CONTROLLER_DIRECTION = [
+    ('0', 'Контроллер на ВХОД и ВЫХОД'),
+    ('1', 'Контроллер на ВХОД'),
+    ('2', 'Контроллер на ВЫХОД'),
+]
+
 class ControllerAdminForm(forms.ModelForm):
     class Meta:
         model = Controller
         widgets = {
             "controller_activity": forms.RadioSelect(choices=CHOICES_CONTROLLER_ACTIVE),
             "controller_online": forms.RadioSelect(choices=CHOICES_CONTROLLER_ONLINE),
+            "direction": forms.RadioSelect(choices=CHOICES_CONTROLLER_DIRECTION),
         }
         fields = '__all__'

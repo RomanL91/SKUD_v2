@@ -5,7 +5,7 @@ from app_checkpoint.models import Checkpoint
 
 class Controller(models.Model):
     name_controller = models.CharField(
-        verbose_name='Имя контроллера', max_length=200, unique=True,
+        verbose_name='Имя контроллера', max_length=200, unique=False,
         help_text='''
         Дайте контроллеру обдуманное и рациональное имя,<br>
         которое ВЫ будете дальше использовать в системе в целом.<br>
@@ -52,7 +52,15 @@ class Controller(models.Model):
         События с такого контроллера не сохраняются в системе и полностью игнорируются.
         '''
     )
-
+    direction = models.CharField(
+        verbose_name='Направление', max_length=30, default='0', blank=True,
+        help_text='''
+        Установите направление контроллера.<br>
+        Другими словами укажите с какой стороны находится контроллер:<br>
+        со стороны входа или стороны выхода с территории/из помещения<br>
+        или же контроллер один на проходную (Контроллер на ВХОД и ВЫХОД).
+        '''
+    )
 
     class Meta:
         verbose_name = 'Контроллер'
