@@ -11,14 +11,16 @@ class ControllerMiddleware:
 
 
     def __call__(self, request):
-        print(" -------->>> custom middleware before next middleware/view")
         response = self.get_response(request)
 
         if request.body[:19] == b'csrfmiddlewaretoken':
             pass
         elif request.body:
-            adapter_to_controller = BaseAdapterForModels(Controller, request)
-            adapter_to_controller.adapt_and_save()
             response = JsonResponse({})
-        print(response.status_code)
+            adapter_to_controller = BaseAdapterForModels(Controller, request)
+            obj, data, created = adapter_to_controller.adapt_and_save()
+            if not created:
+                status_code = adapter_to_controller.send_signal(obj.ip_adress, payload=data)
+                response.status_code = status_code
         return response
+    
