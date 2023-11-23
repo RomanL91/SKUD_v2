@@ -74,9 +74,9 @@ class BaseAdapterForModels:
                     self.__set_active['online'] = int(obj.controller_online.split('/')[0])
                     self.__set_mode['mode'] = int(obj.controller_online.split('/')[1])
                     message_reply = [self.__set_active, self.__set_mode]
-                    payload = self.response_model(message_reply, obj.serial_number)
+                    self.payload = self.response_model(message_reply, obj.serial_number)
                 
-                return obj, payload, create
+                return obj, self.payload, create
 
             elif operation == 'ANY':
                 pass
