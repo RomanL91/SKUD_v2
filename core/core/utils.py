@@ -14,11 +14,10 @@ from app_card_pass.models import CardPass
 class BaseAdapterForModels:
     payload = None
     event_staff = 'Не известный'
-
     event_checkpoint = 'Не известная проходная'
     event_direction = 'Не известно направление'
-
-
+    granted_0 = [2, 4, 6, 7, 14, 17, 26, 28, 30]
+    event_serial_num_controller = None
 
     __controller: models = Controller
     __event: models = Event
@@ -27,7 +26,8 @@ class BaseAdapterForModels:
     __header_resonse: dict = {"date": None, "interval": 10, "sn": None, "messages": None,}
     __set_mode: dict = {"id": 0, "operation": "set_mode", "mode": None}
     __set_active: dict = {"id": 0, "operation": "set_active", "active": None, "online": None}
-    __granted = {"id": 0, "operation": "check_access", "granted": 1}
+    __granted = {"id": 0, "operation": "check_access", "granted": None}
+    __resp_event = {"id":0, "operation": "events", "events_success": None}
   
 
     def __init__(self, request_adaptee, operition_type=None) -> None:
@@ -55,7 +55,32 @@ class BaseAdapterForModels:
         return None
 
 
-    # Переписать, возможно разнести, может использовать конструкцию switch case
+    def get_pass_number_to_dec_format(self, pass_number_hex):
+        pass_number = int(pass_number_hex, base=16)
+        count = 10 - len(str(pass_number))
+        return f'{count*"0"}{pass_number}'
+
+
+    def get_staff_init_event(self, pass_card_dec_format):
+        try:
+            staff_card = self.__card_pass.objects.get(pass_card_dec_format=pass_card_dec_format)
+            self.event_staff = staff_card.staff
+        except self.__card_pass.DoesNotExist:
+            self.__granted['granted'] = 0
+
+
+    def get_place_init_event(self, serial_number):
+        try:
+            event_controller = self.__controller.objects.get(serial_number=serial_number)
+            self.event_serial_num_controller = event_controller.get_serial_number_type_int
+            self.event_checkpoint = event_controller.checkpoint
+            self.event_direction = event_controller.direction
+        except self.__controller.DoesNotExist:
+            self.__granted['granted'] = 0
+            self.event_serial_num_controller = serial_number
+
+
+    # Переписать, много DRY
     def adapt_and_save(self) -> tuple[models.Model, dict, bool]:
             
             if self.operition_type == 'power_on':
@@ -70,39 +95,56 @@ class BaseAdapterForModels:
                     message_reply = [self.__set_active, self.__set_mode]
                     self.payload = self.response_model(message_reply, obj.serial_number)
                     self.send_signal(obj.ip_adress, self.payload)
-                    resp = JsonResponse(self.payload)
-                    resp.status_code = 200
-                    return resp
-                
-                resp = JsonResponse({})
-                resp.status_code = 201
-                return resp 
+                    return self.response(self.payload, create)
+                return self.response()                
 
-            elif self.operition_type == 'events' and issubclass(self.model, self.__event):
-                print('----->>> ENENT 1 factor')
-                return (1, 2, 3)
+            elif self.operition_type == 'events':
+                list_events = self.data_request["messages"][0]["events"]
+
+                for event in list_events:
+                    self.__granted['granted'] = 1
+                    event_date_time = event['time']
+
+                    event_card_hex = event['card']
+                    event_card_dec = self.get_pass_number_to_dec_format(event_card_hex)
+
+                    event_type = event['event']
+                    event_flag = event['flag']
+
+                    self.get_staff_init_event(event_card_dec)
+                    self.get_place_init_event(self.data_request['sn'])
+
+                    if event_type in self.granted_0:
+                        self.__granted['granted'] = 0
+
+                    obj, create = self.__event.objects.get_or_create(
+                        event_class = self.operition_type,
+                        event_date_time = event_date_time,
+                        event_card_hex = event_card_hex,
+                        event_card_dec = event_card_dec,
+                        event_staff = self.event_staff,
+                        event_controller = self.event_serial_num_controller,
+                        event_checkpoint = self.event_checkpoint,
+                        event_direction = self.event_direction,
+                        event_type = event_type,  
+                        event_flag = event_flag,
+                        event_granted = self.__granted['granted'],
+                        event_package = event,
+                    )
+
+                self.__resp_event['events_success'] = len(list_events)
+                data = self.response_model(self.__resp_event, self.event_serial_num_controller)
+                return self.response(data, create)
+            
             elif self.operition_type == 'check_access':
+                self.__granted['granted'] = 1
                 event_date_time = timezone.now()
 
                 event_card_hex = self.data_request['messages'][0]['card']
-                event_card_dec = int(event_card_hex, base=16)
-                count = 10 - len(str(event_card_dec))
-                event_card_dec = f'{count*"0"}{event_card_dec}'
-                try:
-                    staff_card = self.__card_pass.objects.get(pass_card_dec_format=event_card_dec)
-                    self.event_staff = staff_card.staff
-                except self.__card_pass.DoesNotExist:
-                    print('tyt')
-                    self.__granted['granted'] = 0
-                try:
-                    event_controller = self.__controller.objects.get(serial_number=self.data_request['sn'])
-                    event_serial_num_controller = event_controller.get_serial_number_type_int
-                    self.event_checkpoint = event_controller.checkpoint
-                    self.event_direction = event_controller.direction
-                except self.__controller.DoesNotExist:
-                    print('tyt2')
-                    self.__granted['granted'] = 0
-                    event_serial_num_controller = self.data_request["sn"]
+                event_card_dec = self.get_pass_number_to_dec_format(event_card_hex)
+
+                self.get_staff_init_event(event_card_dec)
+                self.get_place_init_event(self.data_request['sn'])
 
                 # if event_granted:
                     # self.__granted['granted'] = 1
@@ -115,7 +157,7 @@ class BaseAdapterForModels:
                     event_card_hex = event_card_hex,
                     event_card_dec = event_card_dec,
                     event_staff = self.event_staff,
-                    event_controller = event_serial_num_controller,
+                    event_controller = self.event_serial_num_controller,
                     event_checkpoint = self.event_checkpoint,
                     event_direction = self.event_direction,
                     event_type = '*',  event_flag = '*',
@@ -123,11 +165,17 @@ class BaseAdapterForModels:
                     event_package = self.data_request,
                 )
 
-                data = self.response_model(self.__granted, event_serial_num_controller)
-                resp = JsonResponse(data)
-                resp.status_code = 201
-                return resp
-            
+                data = self.response_model(self.__granted, self.event_serial_num_controller)
+                return self.response(data=data, status_create=create)
+
+
+    def response(self, data={}, status_create=None):
+        resp = JsonResponse(data)
+        if status_create: 
+            resp.status_code = 201
+        return resp
+
+
     def send_signal(self, url: str, payload: dict=None) -> int:
         try:
             resp = requests.post(url, data=payload)
@@ -135,12 +183,6 @@ class BaseAdapterForModels:
             print('[== ==ERROR== ==] Пакет не доставлен!')
             print(f'[== ==ERROR== ==] {e}')
             pprint(payload, depth=4)
-
-    # async def send_signal(self):
-    #     payload = {'key1': 'value1', 'key2': 'value2'}
-    #     async with aiohttp.ClientSession() as session:
-    #         async with session.post('http://httpbin.org/post', data=payload) as resp:
-    #              print(await resp.text())
 
 
     def response_model(self, message_reply: list | dict, serial_number_controller: int = None) -> dict:

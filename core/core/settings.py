@@ -144,4 +144,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 NO_PROFILE_PHOTO = os.path.join(MEDIA_URL, 'siluet.jpg') #/home/romanl/SKUD_v2/core/media/siluet.jpg
 
 TIME_ZONE = 'Asia/Omsk' 
-USE_TZ = True
+USE_TZ = False
