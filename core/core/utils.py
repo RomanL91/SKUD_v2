@@ -1,4 +1,5 @@
 import json, requests
+from django.http import JsonResponse
 
 from pprint import pprint
 
@@ -12,120 +13,128 @@ from app_card_pass.models import CardPass
 
 class BaseAdapterForModels:
     payload = None
+    event_staff = 'Не известный'
+
+    event_checkpoint = 'Не известная проходная'
+    event_direction = 'Не известно направление'
+
+
 
     __controller: models = Controller
     __event: models = Event
     __card_pass: models = CardPass
+
     __header_resonse: dict = {"date": None, "interval": 10, "sn": None, "messages": None,}
     __set_mode: dict = {"id": 0, "operation": "set_mode", "mode": None}
     __set_active: dict = {"id": 0, "operation": "set_active", "active": None, "online": None}
+    __granted = {"id": 0, "operation": "check_access", "granted": 1}
   
 
-    def __init__(self, model, request_adaptee) -> None:
-        self.model = model
+    def __init__(self, request_adaptee, operition_type=None) -> None:
         self.request_adaptee = request_adaptee
+        self.operition_type = operition_type
 
 
     def to_json(self) -> json:
         if b'operation' in self.request_adaptee.body:
             try:
                 self.data_request = json.loads(self.request_adaptee.body)
-                return self.data_request
+                operition_type = self.data_request['messages'][0]['operation']
+                return self.data_request, operition_type
             except json.decoder.JSONDecodeError:
-                raise ValueError('Не могу преобразовать полученные данные в формат JSON.')
-        else:
-            return self.request_adaptee
-
-    
-    def get_message_from_controller(self):
-        try:
-            return self.to_json()['messages']
-        except KeyError:
-            raise KeyError('Не могу извлеть ключ <messages>')
-        
-
-    def select_message(self, operation_type=None):
-        try:
-            messages = self.get_message_from_controller()
-            if operation_type is None:
+                print(f'[== == ERROR == ==] Ошибка сериализации JSON!')
                 return None
-            for i in messages:
-                if operation_type == i['operation']:
-                    return i
-        except TypeError:
-            pass
-        
-
-    def get_list_type_masseges(self):
-        list_type_message = []
-        for msg in self.get_message_from_controller():
-            try:
-                list_type_message.append(msg['operation'])
             except KeyError:
-                print(f'[== == ERROR == ==] Нет ключа <operation> в сообщении от контроллера!')
-        return list_type_message
+                print(f'[== == ERROR == ==] Ошибка доступа по ключу!')
+                pprint(self.data_request, depth=4)
+                return None
+            except IndexError:
+                print(f'[== == ERROR == ==] Ошибка доступа по индексу! Пустой список сообщений.')
+                pprint(self.data_request, depth=4)
+                return None
+        return None
 
 
     # Переписать, возможно разнести, может использовать конструкцию switch case
     def adapt_and_save(self) -> tuple[models.Model, dict, bool]:
-        for operation in self.get_list_type_masseges():
-            if operation == 'power_on' and issubclass(self.model, self.__controller):
-                obj, create = self.model.objects.get_or_create(
+            
+            if self.operition_type == 'power_on':
+                obj, create = self.__controller.objects.get_or_create(
                     type_controller = self.data_request['type'],
                     serial_number = self.data_request['sn']
                 )
-
                 if not create:
                     self.__set_active['active'] = int(obj.controller_activity)
                     self.__set_active['online'] = int(obj.controller_online.split('/')[0])
                     self.__set_mode['mode'] = int(obj.controller_online.split('/')[1])
                     message_reply = [self.__set_active, self.__set_mode]
                     self.payload = self.response_model(message_reply, obj.serial_number)
+                    self.send_signal(obj.ip_adress, self.payload)
+                    resp = JsonResponse(self.payload)
+                    resp.status_code = 200
+                    return resp
                 
-                return obj, self.payload, create
+                resp = JsonResponse({})
+                resp.status_code = 201
+                return resp 
 
-            elif operation == 'events' and issubclass(self.model, self.__event):
+            elif self.operition_type == 'events' and issubclass(self.model, self.__event):
                 print('----->>> ENENT 1 factor')
                 return (1, 2, 3)
-            elif operation == 'check_access' and issubclass(self.model, self.__event):
+            elif self.operition_type == 'check_access':
                 event_date_time = timezone.now()
+
                 event_card_hex = self.data_request['messages'][0]['card']
                 event_card_dec = int(event_card_hex, base=16)
                 count = 10 - len(str(event_card_dec))
                 event_card_dec = f'{count*"0"}{event_card_dec}'
-                staff_card = self.__card_pass.objects.get(pass_card_dec_format=event_card_dec)
-                staff_card = staff_card
-                event_staff = staff_card.staff
-                event_controller = self.__controller.objects.get(serial_number=self.data_request['sn'])
+                try:
+                    staff_card = self.__card_pass.objects.get(pass_card_dec_format=event_card_dec)
+                    self.event_staff = staff_card.staff
+                except self.__card_pass.DoesNotExist:
+                    print('tyt')
+                    self.__granted['granted'] = 0
+                try:
+                    event_controller = self.__controller.objects.get(serial_number=self.data_request['sn'])
+                    event_serial_num_controller = event_controller.get_serial_number_type_int
+                    self.event_checkpoint = event_controller.checkpoint
+                    self.event_direction = event_controller.direction
+                except self.__controller.DoesNotExist:
+                    print('tyt2')
+                    self.__granted['granted'] = 0
+                    event_serial_num_controller = self.data_request["sn"]
+
+                # if event_granted:
+                    # self.__granted['granted'] = 1
                 # activate_card = staff_card.activate_card,
-                # event_granted = True, # ХАРДКОД
                 # еще проверки для 2 факторки и выдача разрешения
 
-                obj, create = self.model.objects.get_or_create(
-                    event_class = operation,
+                obj, create = self.__event.objects.get_or_create(
+                    event_class = self.operition_type,
                     event_date_time = event_date_time,
                     event_card_hex = event_card_hex,
                     event_card_dec = event_card_dec,
-                    event_staff = event_staff,
-                    event_controller = event_controller,
-                    event_checkpoint = event_controller.checkpoint,
-                    event_direction = event_controller.direction,
+                    event_staff = self.event_staff,
+                    event_controller = event_serial_num_controller,
+                    event_checkpoint = self.event_checkpoint,
+                    event_direction = self.event_direction,
                     event_type = '*',  event_flag = '*',
-                    event_granted = True, # ХАРДКОД
+                    event_granted = self.__granted['granted'],
                     event_package = self.data_request,
                 )
 
-                # return obj, event_granted, create #вместо payload granted
-
+                data = self.response_model(self.__granted, event_serial_num_controller)
+                resp = JsonResponse(data)
+                resp.status_code = 201
+                return resp
             
     def send_signal(self, url: str, payload: dict=None) -> int:
         try:
             resp = requests.post(url, data=payload)
-            return 200
         except Exception as e:
             print('[== ==ERROR== ==] Пакет не доставлен!')
+            print(f'[== ==ERROR== ==] {e}')
             pprint(payload, depth=4)
-            return 400
 
     # async def send_signal(self):
     #     payload = {'key1': 'value1', 'key2': 'value2'}

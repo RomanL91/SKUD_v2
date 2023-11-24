@@ -69,3 +69,8 @@ class Controller(models.Model):
 
     def __str__(self) -> str:
         return self.name_controller
+    
+
+    @property
+    def get_serial_number_type_int(self):
+        return int(self.serial_number)

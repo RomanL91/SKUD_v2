@@ -11,21 +11,27 @@ class Event(models.Model):
     )
     event_card_hex = models.CharField(
         verbose_name='Карта инициатор события (hex)', max_length=15,
+        blank=True, null=True,
     )
     event_card_dec = models.CharField(
         verbose_name='Карта инициатор события dec', max_length=15,
+        blank=True, null=True,
     )
     event_staff = models.CharField(
         verbose_name='Сотрудник инициатор события', max_length=200,
+        blank=True, null=True,
     )
     event_controller = models.CharField(
         verbose_name='Контроллер инициатор события', max_length=200,
+        blank=True, null=True,
     )
     event_checkpoint = models.CharField(
-        verbose_name='Проходная иницитор события', max_length=200
+        verbose_name='Проходная иницитор события', max_length=200,
+        blank=True, null=True,
     )
     event_direction = models.CharField(
         verbose_name='Направление события', max_length=30,
+        blank=True, null=True,
     )
     event_type = models.CharField(
         verbose_name='Тип события (код от контроллера)', max_length=5,
