@@ -80,7 +80,6 @@ class BaseAdapterForModels:
             self.event_serial_num_controller = serial_number
 
 
-    # Переписать, много DRY
     def adapt_and_save(self) -> tuple[models.Model, dict, bool]:
             
             if self.operition_type == 'power_on':
