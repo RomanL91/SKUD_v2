@@ -42,10 +42,14 @@ class Event(models.Model):
         blank=True, null=True,
     )
     event_granted = models.BooleanField(
-        verbose_name='Разрешение доступа для события', default=False,
+        verbose_name='Решение по доступу для события', default=False,
     )
     event_package = models.JSONField(
         verbose_name='Присланный пакет события', default=dict,
+    )
+    event_reason_granted = models.CharField(
+        verbose_name='Тип решения по доступу', max_length=200,
+        default='тип не определен', blank=True, null=True
     )
 
     
