@@ -10,11 +10,10 @@ class DepartamentAdmin(admin.ModelAdmin):
     list_display = ['name_departament', 'interception', 'desc_dep']
 
     def save_model(self, request, obj, form, change):
-        if 'interception' in form.data:
-            objs_to_update = []
-            all_staffs_this_dep = obj.staff_set.all()
-            for staff in all_staffs_this_dep:
-                staff.interception = obj.interception
-                objs_to_update.append(staff)
-            Staff.objects.bulk_update(objs_to_update, ['interception'])
+        objs_to_update = []
+        all_staffs_this_dep = obj.staff_set.all()
+        for staff in all_staffs_this_dep:
+            staff.interception = obj.interception
+            objs_to_update.append(staff)
+        Staff.objects.bulk_update(objs_to_update, ['interception'])
         obj.save()
