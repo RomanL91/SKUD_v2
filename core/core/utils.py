@@ -65,6 +65,8 @@ class BaseAdapterForModels:
         try:
             staff_card = self.__card_pass.objects.get(pass_card_dec_format=pass_card_dec_format)
             self.event_staff = staff_card.staff
+            if staff_card.staff.interception:
+                self.__granted['granted'] = 0
         except self.__card_pass.DoesNotExist:
             self.__granted['granted'] = 0
 
