@@ -64,7 +64,7 @@ class BaseAdapterForModels:
     def get_staff_init_event(self, pass_card_dec_format):
         try:
             staff_card = self.__card_pass.objects.get(pass_card_dec_format=pass_card_dec_format)
-            self.event_staff = staff_card.staff
+            self.event_staff = f'{staff_card.staff.last_name} {staff_card.staff.first_name} {staff_card.staff.patromic}'
             if staff_card.staff.interception or not staff_card.activate_card:
                 self.__granted['granted'] = 0
         except self.__card_pass.DoesNotExist:
