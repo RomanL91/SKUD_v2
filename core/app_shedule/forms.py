@@ -1,13 +1,13 @@
 from django import forms
 
-from app_shedule.models import Schedule, Day
+from app_shedule.models import Day
 
 
-CHOICES_TYPE_SCHEDULE = [
-    ('Расписание проходной', 'Расписание проходной'),
-    ('Расписание профиля', 'Расписание профиля'),
-    ('Расписание сотрудника', 'Расписание сотрудника'),
-]
+# CHOICES_TYPE_SCHEDULE = [
+#     ('Расписание проходной', 'Расписание проходной'),
+#     ('Расписание профиля', 'Расписание профиля'),
+#     ('Расписание сотрудника', 'Расписание сотрудника'),
+# ]
 
 CHOICES_WEEK_DAY = [
     ('Понедельник', 'Понедельник'),
@@ -20,13 +20,13 @@ CHOICES_WEEK_DAY = [
 ]
 
 
-class ScheduleAdminForm(forms.ModelForm):
-    class Meta:
-        model = Schedule
-        widgets = {
-            "type_schedule": forms.RadioSelect(choices=CHOICES_TYPE_SCHEDULE),
-        }
-        fields = '__all__'
+# class ScheduleAdminForm(forms.ModelForm):
+#     class Meta:
+#         model = Schedule
+#         widgets = {
+#             "type_schedule": forms.RadioSelect(choices=CHOICES_TYPE_SCHEDULE),
+#         }
+#         fields = '__all__'
 
 
 class DayAdminForm(forms.ModelForm):

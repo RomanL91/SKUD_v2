@@ -5,7 +5,7 @@ from django import forms
 
 from app_shedule.models import Schedule, Day
 
-from app_shedule.forms import ScheduleAdminForm, DayAdminForm , CHOICES_WEEK_DAY
+from app_shedule.forms import DayAdminForm , CHOICES_WEEK_DAY
 
 
 class DayInline(admin.StackedInline):
@@ -26,12 +26,12 @@ class ScheduleAdmin(admin.ModelAdmin):
     list_display = [
         'name_schedule', 'desc_schedule'
     ]
-    form = ScheduleAdminForm
+    # form = ScheduleAdminForm
     inlines = [DayInline,]
-    fieldsets = (
-        (None, {'fields': ('name_schedule', 'desc_schedule')}),
-        ('Тип расписания', {'fields': (('type_schedule', ),),}),
-    )
+    # fieldsets = (
+    #     (None, {'fields': ('name_schedule', 'desc_schedule')}),
+    #     ('Тип расписания', {'fields': (('type_schedule', ),),}),
+    # )
 
 
 @admin.register(Day)
