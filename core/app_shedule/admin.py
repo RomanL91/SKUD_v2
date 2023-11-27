@@ -24,13 +24,13 @@ class ScheduleAdmin(admin.ModelAdmin):
         'name_schedule',
     ]
     list_display = [
-        'name_schedule', 'type_schedule', 'strict_schedule', 'desc_schedule'
+        'name_schedule', 'desc_schedule'
     ]
     form = ScheduleAdminForm
     inlines = [DayInline,]
     fieldsets = (
         (None, {'fields': ('name_schedule', 'desc_schedule')}),
-        ('Тип расписания', {'fields': (('type_schedule', 'strict_schedule'),),}),
+        ('Тип расписания', {'fields': (('type_schedule', ),),}),
     )
 
 
