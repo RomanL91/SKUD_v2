@@ -27,10 +27,18 @@ class TagAdmin(admin.ModelAdmin):
 
 
     def save_model(self, request, obj, form, change):
-        objs_to_update = []
-        all_staffs_this_dep = obj.staff_set.all()
-        for staff in all_staffs_this_dep:
+        objs_to_update = set()
+        all_staffs_this_tag = obj.staff_set.all()
+        all_position_this_tag = obj.position_set.all()
+
+        for staff in all_staffs_this_tag:
             staff.interception = obj.interception
-            objs_to_update.append(staff)
+            objs_to_update.add(staff)
+
+        for position in all_position_this_tag:
+            for staff in position.staff_set.all():
+                staff.interception = obj.interception
+                objs_to_update.add(staff)
+
         Staff.objects.bulk_update(objs_to_update, ['interception'])
         obj.save()
