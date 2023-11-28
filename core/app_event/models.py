@@ -52,7 +52,7 @@ class Event(models.Model):
         default='тип не определен', blank=True, null=True
     )
     late = models.BooleanField(
-        verbose_name='Опоздание?', default=False
+        verbose_name='Опоздание??', default=False
     )
     event_late_status = models.CharField(
         verbose_name='Статус опоздания', max_length=250,
