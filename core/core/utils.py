@@ -36,6 +36,7 @@ class BaseAdapterForModels:
 
     __late_status = 'Без нарушений графика'
     __late = False
+    __queue_broken = False
     schedule_for_today = None
     week_days = ('Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье')
   
@@ -127,6 +128,7 @@ class BaseAdapterForModels:
                         event_date_time - datetime.combine(event_date, self.schedule_for_today.day_time_start)
                     }'''
             else:
+                self.__queue_broken = True
                 self.__late_status = 'Не известно время выхода'
         elif events_staff_today.last() is not None and self.schedule_for_today is not None:
             time_interval_before_break = [self.schedule_for_today.day_time_start, self.schedule_for_today.break_in_schedule_start]
@@ -154,6 +156,8 @@ class BaseAdapterForModels:
                     if e.count() == 0:
                         self.__late_status = f'''Опоздание на {
                             event_date_time - datetime.combine(event_date, time_interval_after_break[0])}'''
+        if events_staff_today.last() is not None and events_staff_today.last().event_direction == self.event_direction:
+                self.__queue_broken = True
 
 
     def adapt_and_save(self) -> tuple[models.Model, dict, bool]:
@@ -212,6 +216,7 @@ class BaseAdapterForModels:
                     )
                     obj.late = self.__late
                     obj.event_late_status = self.__late_status
+                    obj.ENTRY_EXIT_queue_broken = self.__queue_broken
                     obj.save()
 
                 self.__resp_event['events_success'] = len(list_events)
