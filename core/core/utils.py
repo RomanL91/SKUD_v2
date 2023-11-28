@@ -1,6 +1,6 @@
 import json, requests
 from pprint import pprint
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from django.http import JsonResponse
 
@@ -35,6 +35,7 @@ class BaseAdapterForModels:
     __resp_event = {"id":0, "operation": "events", "events_success": None}
 
     __late_status = 'Без нарушений графика'
+    __late = False
     schedule_for_today = None
     week_days = ('Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье')
   
@@ -85,7 +86,7 @@ class BaseAdapterForModels:
         try:
             event_controller = self.__controller.objects.get(serial_number=serial_number)
             self.event_serial_num_controller = event_controller.get_serial_number_type_int
-            self.event_checkpoint = event_controller.checkpoint
+            self.event_checkpoint = str(event_controller.checkpoint)
             self.event_direction = event_controller.direction
         except self.__controller.DoesNotExist:
             self.__granted['granted'] = 0
@@ -93,47 +94,66 @@ class BaseAdapterForModels:
 
 
     def get_late_status(self, event_date_time):
-        # время события 
-        print('входящее время -->>', event_date_time, type(event_date_time))
         event_time = event_date_time.time()
-        print('время события -->>', event_time, type(event_time))
-        # дата события
         event_date = event_date_time.date()
-        print(event_date)
-        # щбьект самого сотрудника
-        print(self.obj_staff)
-        print(self.obj_staff.schedule)
-        # получить расписание на сегодня
         week_day = self.week_days[event_date.weekday()]
-        print(week_day)
         for day_schedule in self.obj_staff.schedule.day_set.all():
-            print('--->>', day_schedule)
             if week_day == day_schedule.week_day:
                 self.schedule_for_today = day_schedule
-        # узнаем первое ли это событие за сегодня данного сотрудника
+        # Это наверное другой подход....или его начало (оставлю поак что)
+        # time_interval_before_break = [self.schedule_for_today.day_time_start, self.schedule_for_today.break_in_schedule_start]
+        # time_interval_after_break = [self.schedule_for_today.break_in_schedule_end, self.schedule_for_today.day_time_end]
+        # if self.schedule_for_today.break_in_schedule_start is None or \
+        #         self.schedule_for_today.break_in_schedule_end is None:
+        #     time_interval_before_break[1] = self.schedule_for_today.day_time_end
+        #     time_interval_after_break[0] = self.schedule_for_today.day_time_start
+
+        # e = self.__event.objects.filter(
+        #     Q(event_date_time__range=(
+        #         str(datetime.combine(event_date, time_interval_before_break[0])), 
+        #         str(datetime.combine(event_date, time_interval_before_break[1])))
+        #     ) or 
+        #     Q(event_date_time__range=(
+        #         str(datetime.combine(event_date, time_interval_after_break[0])),
+        #         str(datetime.combine(event_date, time_interval_after_break[1])))
+        #     ))
         events_staff_today = self.__event.objects.filter(
                     Q(event_staff=self.event_staff), Q(event_date_time__date=event_date))
-        print(events_staff_today)
-        print(f'расписание сегодня -->>> {self.schedule_for_today}')
-        print(f'расписание сегодня -->>> {self.schedule_for_today}')
         if events_staff_today.last() is None and self.schedule_for_today is not None:
-            print('это первое событие!!!!')
-            # получить направлние события
-            print(self.event_direction)
-            if self.event_direction == 'ВХОД' or self.event['direct'] == 1:
-                print('ОПОЗДАНИЕ')
-                print('время графика -->>', self.schedule_for_today.day_time_start, type(self.schedule_for_today.day_time_start))
-                if self.schedule_for_today.day_time_start > event_time:
+            if self.event_direction == 'ВХОД' and self.event['direct'] == 1:
+                if self.schedule_for_today.day_time_start < event_time:
+                    self.__late = True
                     self.__late_status = f'''Опоздание на {
-                        datetime.combine(event_date, self.schedule_for_today.day_time_start) - event_date_time
+                        event_date_time - datetime.combine(event_date, self.schedule_for_today.day_time_start)
                     }'''
             else:
                 self.__late_status = 'Не известно время выхода'
-        print('late_status -->>', self.__late_status)
-        print('пакет -->>', self.event)
-            
-            
-
+        elif events_staff_today.last() is not None and self.schedule_for_today is not None:
+            time_interval_before_break = [self.schedule_for_today.day_time_start, self.schedule_for_today.break_in_schedule_start]
+            time_interval_after_break = [self.schedule_for_today.break_in_schedule_end, self.schedule_for_today.day_time_end]
+            if self.schedule_for_today.break_in_schedule_start is None or \
+                self.schedule_for_today.break_in_schedule_end is None:
+                time_interval_before_break[1] = self.schedule_for_today.day_time_end
+                time_interval_after_break[0] = self.schedule_for_today.day_time_start
+            if self.event_direction == 'ВЫХОД' and self.event['direct'] == 2:
+                if time_interval_before_break[0] < event_time < time_interval_before_break[1]:
+                    self.__late_status = f'''До конца рабочего дня осталось: {
+                        datetime.combine(event_date, time_interval_before_break[1]) - event_date_time
+                    }'''
+                if time_interval_after_break[0] < event_time < time_interval_after_break[1]:
+                    self.__late_status = f'''До конца рабочего дня осталось: {
+                        datetime.combine(event_date, time_interval_after_break[1]) - event_date_time
+                    }'''
+            else:
+                if time_interval_after_break[0] < event_time < time_interval_after_break[1]:
+                    e = self.__event.objects.filter(
+                    Q(event_date_time__range=(
+                            str(datetime.combine(event_date, time_interval_after_break[0])),
+                            str(datetime.combine(event_date, time_interval_after_break[1])))
+                    ))
+                    if e.count() == 0:
+                        self.__late_status = f'''Опоздание на {
+                            event_date_time - datetime.combine(event_date, time_interval_after_break[0])}'''
 
 
     def adapt_and_save(self) -> tuple[models.Model, dict, bool]:
@@ -170,8 +190,8 @@ class BaseAdapterForModels:
 
                     self.get_staff_init_event(event_card_dec)
                     self.get_place_init_event(self.data_request['sn'])
-
                     self.get_late_status(event_time)
+
 
                     if event_type in self.granted_0:
                         self.__granted['granted'] = 0
@@ -190,6 +210,9 @@ class BaseAdapterForModels:
                         event_granted = self.__granted['granted'],
                         event_package = event,
                     )
+                    obj.late = self.__late
+                    obj.event_late_status = self.__late_status
+                    obj.save()
 
                 self.__resp_event['events_success'] = len(list_events)
                 data = self.response_model(self.__resp_event, self.event_serial_num_controller)
