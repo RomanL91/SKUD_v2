@@ -121,7 +121,7 @@ class BaseAdapterForModels:
         events_staff_today = self.__event.objects.filter(
                     Q(event_staff=self.event_staff), Q(event_date_time__date=event_date))
         if events_staff_today.last() is None and self.schedule_for_today is not None:
-            if self.event_direction == 'ВХОД' and self.event['direct'] == 1:
+            if self.event_direction == 'ВХОД' and self.event['reader'] == 1:
                 if self.schedule_for_today.day_time_start < event_time:
                     self.__late = True
                     self.__late_status = f'''Опоздание на {
@@ -137,7 +137,7 @@ class BaseAdapterForModels:
                 self.schedule_for_today.break_in_schedule_end is None:
                 time_interval_before_break[1] = self.schedule_for_today.day_time_end
                 time_interval_after_break[0] = self.schedule_for_today.day_time_start
-            if self.event_direction == 'ВЫХОД' and self.event['direct'] == 2:
+            if self.event_direction == 'ВЫХОД' and self.event['reader'] == 2:
                 if time_interval_before_break[0] < event_time < time_interval_before_break[1]:
                     self.__late_status = f'''До конца рабочего дня осталось: {
                         datetime.combine(event_date, time_interval_before_break[1]) - event_date_time
@@ -196,7 +196,6 @@ class BaseAdapterForModels:
                     self.get_place_init_event(self.data_request['sn'])
                     self.get_late_status(event_time)
 
-
                     if event_type in self.granted_0:
                         self.__granted['granted'] = 0
 
@@ -228,10 +227,12 @@ class BaseAdapterForModels:
                 event_date_time = timezone.now()
 
                 event_card_hex = self.data_request['messages'][0]['card']
+                self.event = self.data_request['messages'][0]
                 event_card_dec = self.get_pass_number_to_dec_format(event_card_hex)
 
                 self.get_staff_init_event(event_card_dec)
                 self.get_place_init_event(self.data_request['sn'])
+                self.get_late_status(event_date_time)
 
                 # if event_granted:
                     # self.__granted['granted'] = 1
@@ -251,6 +252,10 @@ class BaseAdapterForModels:
                     event_granted = self.__granted['granted'],
                     event_package = self.data_request,
                 )
+                obj.late = self.__late
+                obj.event_late_status = self.__late_status
+                obj.ENTRY_EXIT_queue_broken = self.__queue_broken
+                obj.save()
 
                 data = self.response_model(self.__granted, self.event_serial_num_controller)
                 return self.response(data=data, status_create=create)
