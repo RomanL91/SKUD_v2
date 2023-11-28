@@ -224,7 +224,7 @@ class BaseAdapterForModels:
             
             elif self.operition_type == 'check_access':
                 self.__granted['granted'] = 1
-                event_date_time = timezone.now()
+                event_date_time = timezone.now().replace(microsecond=0)
 
                 event_card_hex = self.data_request['messages'][0]['card']
                 self.event = self.data_request['messages'][0]
