@@ -51,6 +51,13 @@ class Event(models.Model):
         verbose_name='Тип решения по доступу', max_length=200,
         default='тип не определен', blank=True, null=True
     )
+    late = models.BooleanField(
+        verbose_name='Опоздание?', default=False
+    )
+    event_late_status = models.CharField(
+        verbose_name='Статус опоздания', max_length=250,
+        blank=True, null=True, default='Без нарушений графика'
+    )
 
     
     class Meta:

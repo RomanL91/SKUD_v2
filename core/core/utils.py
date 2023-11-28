@@ -1,10 +1,12 @@
 import json, requests
-from django.http import JsonResponse
-
 from pprint import pprint
+from datetime import datetime, timedelta
+
+from django.http import JsonResponse
 
 from django.utils import timezone
 from django.db import models
+from django.db.models import Q
 
 from app_controller.models import Controller
 from app_event.models import Event
@@ -13,11 +15,14 @@ from app_card_pass.models import CardPass
 
 class BaseAdapterForModels:
     payload = None
+    obj_staff = None
     event_staff = 'Не известный'
     event_checkpoint = 'Не известная проходная'
     event_direction = 'Не известно направление'
     granted_0 = [2, 4, 6, 7, 14, 17, 26, 28, 30]
     event_serial_num_controller = None
+    event = None
+   
 
     __controller: models = Controller
     __event: models = Event
@@ -28,6 +33,10 @@ class BaseAdapterForModels:
     __set_active: dict = {"id": 0, "operation": "set_active", "active": None, "online": None}
     __granted = {"id": 0, "operation": "check_access", "granted": None}
     __resp_event = {"id":0, "operation": "events", "events_success": None}
+
+    __late_status = 'Без нарушений графика'
+    schedule_for_today = None
+    week_days = ('Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье')
   
 
     def __init__(self, request_adaptee, operition_type=None) -> None:
@@ -64,6 +73,7 @@ class BaseAdapterForModels:
     def get_staff_init_event(self, pass_card_dec_format):
         try:
             staff_card = self.__card_pass.objects.get(pass_card_dec_format=pass_card_dec_format)
+            self.obj_staff = staff_card.staff
             self.event_staff = f'{staff_card.staff.last_name} {staff_card.staff.first_name} {staff_card.staff.patromic}'
             if staff_card.staff.interception or not staff_card.activate_card:
                 self.__granted['granted'] = 0
@@ -80,6 +90,50 @@ class BaseAdapterForModels:
         except self.__controller.DoesNotExist:
             self.__granted['granted'] = 0
             self.event_serial_num_controller = serial_number
+
+
+    def get_late_status(self, event_date_time):
+        # время события 
+        print('входящее время -->>', event_date_time, type(event_date_time))
+        event_time = event_date_time.time()
+        print('время события -->>', event_time, type(event_time))
+        # дата события
+        event_date = event_date_time.date()
+        print(event_date)
+        # щбьект самого сотрудника
+        print(self.obj_staff)
+        print(self.obj_staff.schedule)
+        # получить расписание на сегодня
+        week_day = self.week_days[event_date.weekday()]
+        print(week_day)
+        for day_schedule in self.obj_staff.schedule.day_set.all():
+            print('--->>', day_schedule)
+            if week_day == day_schedule.week_day:
+                self.schedule_for_today = day_schedule
+        # узнаем первое ли это событие за сегодня данного сотрудника
+        events_staff_today = self.__event.objects.filter(
+                    Q(event_staff=self.event_staff), Q(event_date_time__date=event_date))
+        print(events_staff_today)
+        print(f'расписание сегодня -->>> {self.schedule_for_today}')
+        print(f'расписание сегодня -->>> {self.schedule_for_today}')
+        if events_staff_today.last() is None and self.schedule_for_today is not None:
+            print('это первое событие!!!!')
+            # получить направлние события
+            print(self.event_direction)
+            if self.event_direction == 'ВХОД' or self.event['direct'] == 1:
+                print('ОПОЗДАНИЕ')
+                print('время графика -->>', self.schedule_for_today.day_time_start, type(self.schedule_for_today.day_time_start))
+                if self.schedule_for_today.day_time_start > event_time:
+                    self.__late_status = f'''Опоздание на {
+                        datetime.combine(event_date, self.schedule_for_today.day_time_start) - event_date_time
+                    }'''
+            else:
+                self.__late_status = 'Не известно время выхода'
+        print('late_status -->>', self.__late_status)
+        print('пакет -->>', self.event)
+            
+            
+
 
 
     def adapt_and_save(self) -> tuple[models.Model, dict, bool]:
@@ -103,8 +157,10 @@ class BaseAdapterForModels:
                 list_events = self.data_request["messages"][0]["events"]
 
                 for event in list_events:
+                    self.event = event
                     self.__granted['granted'] = 1
                     event_date_time = event['time']
+                    event_time = datetime.strptime(event_date_time, "%Y-%m-%d %H:%M:%S")
 
                     event_card_hex = event['card']
                     event_card_dec = self.get_pass_number_to_dec_format(event_card_hex)
@@ -114,6 +170,8 @@ class BaseAdapterForModels:
 
                     self.get_staff_init_event(event_card_dec)
                     self.get_place_init_event(self.data_request['sn'])
+
+                    self.get_late_status(event_time)
 
                     if event_type in self.granted_0:
                         self.__granted['granted'] = 0
