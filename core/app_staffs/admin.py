@@ -45,6 +45,7 @@ class StaffAdmin(admin.ModelAdmin):
                 if isinstance(obj, CardPass):
                     for instance in instances:
                         instance.formatting_in_hex
+                        instance.send_card_to_controller
             except IndexError:
                 pass
             self.save_formset(request, form, formset, change=change)

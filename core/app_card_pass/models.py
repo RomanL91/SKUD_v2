@@ -91,6 +91,16 @@ class CardPass(models.Model):
         self.pass_cart_hex_format = hex_pass_number
         self.save()
 
+    @property
+    def send_card_to_controller(self):
+        from core.utils import BaseAdapterForModels
+        adapter = BaseAdapterForModels()
+        print(self)
+        print(self.staff)
+        print(self.staff.access_profile)
+        print(self.staff.access_profile.checpoint)
+        # print(self.staff.access_profile.checpoint_set.all())
+
 
     def __str__(self) -> str:
         return self.pass_card_dec_format
