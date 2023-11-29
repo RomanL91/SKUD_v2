@@ -40,14 +40,9 @@ class StaffAdmin(admin.ModelAdmin):
         form.save_m2m()
         for formset in formsets:
             instances = formset.save(commit=False)
-            try:
-                obj = instances[0]
+            for obj in instances:
                 if isinstance(obj, CardPass):
-                    for instance in instances:
-                        instance.formatting_in_hex
-                        instance.send_card_to_controller
-            except IndexError:
-                pass
+                    obj.formatting_in_hex
             self.save_formset(request, form, formset, change=change)
 
 
