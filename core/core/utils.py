@@ -277,7 +277,7 @@ class BaseAdapterForModels:
         except Exception as e:
             print('[== ==ERROR== ==] Пакет не доставлен!')
             print(f'[== ==ERROR== ==] {e}')
-            pprint(payload, depth=4)
+            pprint(payload, depth=10)
 
 
     def response_model(self, message_reply: list | dict, serial_number_controller: int = None) -> dict:
