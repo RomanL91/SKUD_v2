@@ -31,6 +31,9 @@ class BaseAdapterForModels:
     __header_resonse: dict = {"date": None, "interval": 10, "sn": None, "messages": None,}
     set_mode: dict = {"id": 0, "operation": "set_mode", "mode": None}
     set_active: dict = {"id": 0, "operation": "set_active", "active": None, "online": None}
+    add_card: dict = {
+        "id": 0, "operation": "add_cards", "cards": [
+            {"card": None, "flags": 0, "tz": 255},]}
     __granted = {"id": 0, "operation": "check_access", "granted": None}
     __resp_event = {"id":0, "operation": "events", "events_success": None}
 
