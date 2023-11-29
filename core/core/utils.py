@@ -23,14 +23,14 @@ class BaseAdapterForModels:
     event_serial_num_controller = None
     event = None
    
-
+#  Нужно подумать о приватности и гетарах сетерах
     __controller: models = Controller
     __event: models = Event
     __card_pass: models = CardPass
 
     __header_resonse: dict = {"date": None, "interval": 10, "sn": None, "messages": None,}
-    __set_mode: dict = {"id": 0, "operation": "set_mode", "mode": None}
-    __set_active: dict = {"id": 0, "operation": "set_active", "active": None, "online": None}
+    set_mode: dict = {"id": 0, "operation": "set_mode", "mode": None}
+    set_active: dict = {"id": 0, "operation": "set_active", "active": None, "online": None}
     __granted = {"id": 0, "operation": "check_access", "granted": None}
     __resp_event = {"id":0, "operation": "events", "events_success": None}
 
@@ -41,7 +41,7 @@ class BaseAdapterForModels:
     week_days = ('Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье')
   
 
-    def __init__(self, request_adaptee, operition_type=None) -> None:
+    def __init__(self, request_adaptee=None, operition_type=None) -> None:
         self.request_adaptee = request_adaptee
         self.operition_type = operition_type
 
@@ -168,9 +168,9 @@ class BaseAdapterForModels:
                     serial_number = self.data_request['sn']
                 )
                 if not create:
-                    self.__set_active['active'] = int(obj.controller_activity)
-                    self.__set_active['online'] = int(obj.controller_online.split('/')[0])
-                    self.__set_mode['mode'] = int(obj.controller_online.split('/')[1])
+                    self.set_active['active'] = int(obj.controller_activity)
+                    self.set_active['online'] = int(obj.controller_online.split('/')[0])
+                    self.set_mode['mode'] = int(obj.controller_online.split('/')[1])
                     message_reply = [self.__set_active, self.__set_mode]
                     self.payload = self.response_model(message_reply, obj.serial_number)
                     self.send_signal(obj.ip_adress, self.payload)
