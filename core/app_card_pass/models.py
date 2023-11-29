@@ -62,7 +62,7 @@ class CardPass(models.Model):
 
 
     @property
-    def formatting_in_hex(self):
+    def formatting_in_hex(self): # под рефактор
         mask = ['000000']
         match self.pass_card_dec_format:
             case num if len(num) == 10:
@@ -81,10 +81,13 @@ class CardPass(models.Model):
                     hex_pass_number = ''.join(mask).upper()
             case _:
                 pass
-            
         if len(hex_pass_number) > 12:
             ind_trim = len(hex_pass_number) - 12
             hex_pass_number = hex_pass_number[ind_trim:]
+        else:
+            count = 12 - len(hex_pass_number)
+            hex_pass_number = f'{"0"*count}{hex_pass_number}'
+
         self.pass_cart_hex_format = hex_pass_number
         self.save()
 
