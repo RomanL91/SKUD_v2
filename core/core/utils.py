@@ -12,6 +12,9 @@ from app_controller.models import Controller
 from app_event.models import Event
 from app_card_pass.models import CardPass
 
+from core.ServicesMultiProc import MultiprocessingDecorator
+
+
 
 class BaseAdapterForModels:
     payload = None
@@ -270,7 +273,7 @@ class BaseAdapterForModels:
             resp.status_code = 201
         return resp
 
-
+    @MultiprocessingDecorator()
     def send_signal(self, url: str, payload: dict=None) -> int:
         try:
             resp = requests.post(url, data=payload)
