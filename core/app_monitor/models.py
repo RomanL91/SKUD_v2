@@ -12,6 +12,7 @@ class Monitor(models.Model):
     )
     monitor_checkpoint = models.ManyToManyField(
         Checkpoint, blank=True,
+        verbose_name='Проходные для монитора'
         # help_text=
     )
 
