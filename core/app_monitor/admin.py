@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from app_monitor.models import Monitor
+
+
+@admin.register(Monitor)
+class MonitorAdmin(admin.ModelAdmin):
+    pass
