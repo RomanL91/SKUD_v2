@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'app_access_profile',
     'app_shedule',
     'app_event',
+    'app_monitor',
 ]
 
 MIDDLEWARE = [
