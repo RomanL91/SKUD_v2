@@ -98,6 +98,10 @@ class CardPass(models.Model):
     
 
 from core.utils import BaseAdapterForModels
+# from core.ServicesMultiProc import current_request
+# from django.contrib.auth.models import User
+# from django.contrib import messages
+
 
 # DRY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @receiver(pre_save, sender=CardPass)

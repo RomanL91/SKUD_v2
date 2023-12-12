@@ -15,7 +15,6 @@ from app_card_pass.models import CardPass
 from core.ServicesMultiProc import MultiprocessingDecorator
 
 
-
 class BaseAdapterForModels:
     payload = None
     obj_staff = None
@@ -25,7 +24,7 @@ class BaseAdapterForModels:
     granted_0 = [2, 4, 6, 7, 14, 17, 26, 28, 30]
     event_serial_num_controller = None
     event = None
-   
+
 #  Нужно подумать о приватности и гетарах сетерах
     __controller: models = Controller
     __event: models = Event
@@ -274,12 +273,14 @@ class BaseAdapterForModels:
         if status_create: 
             resp.status_code = 201
         return resp
+    
 
     @MultiprocessingDecorator()
-    def send_signal(self, url: str, payload: dict=None) -> int:
+    def send_signal(self, url: str, payload: dict=None, **kwargs) -> int:
         try:
             resp = requests.post(url, data=payload)
         except Exception as e:
+            # пробуем к обьекту щапроса прикрепить доп инфу
             print('[== ==ERROR== ==] Пакет не доставлен!')
             print(f'[== ==ERROR== ==] {e}')
             pprint(payload, depth=10)
