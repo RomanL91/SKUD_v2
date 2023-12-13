@@ -60,51 +60,51 @@
 
         ws.onmessage = function (event) {
             console.log('--------->', event)
-            var ddata = JSON.parse(event.data)
-            if (ddata) {
-                var tr = document.createElement('tr');
+            // var ddata = JSON.parse(event.data)
+            // if (ddata) {
+            //     var tr = document.createElement('tr');
 
-                var tdPhoto = document.createElement('td');
-                tdPhoto.innerHTML = ddata.photo
+            //     var tdPhoto = document.createElement('td');
+            //     tdPhoto.innerHTML = ddata.photo
 
-                var tdLastName = document.createElement('td');
-                tdLastName.innerHTML = ddata.staff_last_name
+            //     var tdLastName = document.createElement('td');
+            //     tdLastName.innerHTML = ddata.staff_last_name
 
-                var tdFirstName = document.createElement('td');
-                tdFirstName.innerHTML = ddata.staff_first_name
+            //     var tdFirstName = document.createElement('td');
+            //     tdFirstName.innerHTML = ddata.staff_first_name
 
-                var tdDepartament = document.createElement('td');
-                tdDepartament.innerHTML = ddata.departament
+            //     var tdDepartament = document.createElement('td');
+            //     tdDepartament.innerHTML = ddata.departament
 
-                var tdCheckpoint = document.createElement('td');
-                tdCheckpoint.innerHTML = ddata.checkpoint
+            //     var tdCheckpoint = document.createElement('td');
+            //     tdCheckpoint.innerHTML = ddata.checkpoint
 
-                var tdTime = document.createElement('td');
-                tdTime.innerHTML = ddata.time_created
+            //     var tdTime = document.createElement('td');
+            //     tdTime.innerHTML = ddata.time_created
 
-                var tdGranted = document.createElement('td');
-                if (ddata.granted == 1) {
-                    tdGranted.innerHTML = 'доступ разрешен'
-                } else {
-                    tdGranted.innerHTML = 'доступ запрешен'
-                }
+            //     var tdGranted = document.createElement('td');
+            //     if (ddata.granted == 1) {
+            //         tdGranted.innerHTML = 'доступ разрешен'
+            //     } else {
+            //         tdGranted.innerHTML = 'доступ запрешен'
+            //     }
 
-                var tdDirections = document.createElement('td');
-                tdDirections.innerHTML = 'huevoe'
+            //     var tdDirections = document.createElement('td');
+            //     tdDirections.innerHTML = 'huevoe'
 
-                tr.appendChild(tdPhoto);
-                tr.appendChild(tdLastName);
-                tr.appendChild(tdFirstName);
-                tr.appendChild(tdDepartament);
-                tr.appendChild(tdCheckpoint);
-                tr.appendChild(tdTime);
-                tr.appendChild(tdGranted);
-                tr.appendChild(tdDirections);
-                tab.appendChild(tr)
+            //     tr.appendChild(tdPhoto);
+            //     tr.appendChild(tdLastName);
+            //     tr.appendChild(tdFirstName);
+            //     tr.appendChild(tdDepartament);
+            //     tr.appendChild(tdCheckpoint);
+            //     tr.appendChild(tdTime);
+            //     tr.appendChild(tdGranted);
+            //     tr.appendChild(tdDirections);
+            //     tab.appendChild(tr)
 
-                return tr;
+            //     return tr;
 
-            }
+            // }
         }
         ws.onerror = function (event) {
             console.log('WebSocket Error...', event)
