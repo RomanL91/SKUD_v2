@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'django_extensions',
     'channels',
+    'rest_framework',
 
     'app_staffs',
     'app_card_pass',

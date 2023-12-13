@@ -84,8 +84,12 @@ class Event(models.Model):
         return self.event_staff
 
 
+from app_event.serializers import EventSerializer
+
+
 @receiver(post_save, sender=Event)
 def send_message(sender, instance, **kwargs):
+    data = EventSerializer(instance).data
     channels_ = channels.layers.get_channel_layer()
-    async_to_sync(channels_.group_send)("client", {"type": "receive", "text_data": {"data": "data"}})
+    async_to_sync(channels_.group_send)("client", {"type": "receive", "text_data": {"data": data}})
     
