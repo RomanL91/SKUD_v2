@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django_extensions',
+    'channels',
 
     'app_staffs',
     'app_card_pass',
@@ -86,7 +87,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
-
+ASGI_APPLICATION = 'core.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -151,3 +152,12 @@ NO_PROFILE_PHOTO = os.path.join(MEDIA_URL, 'siluet.jpg') #/home/romanl/SKUD_v2/c
 
 TIME_ZONE = 'Asia/Omsk' 
 USE_TZ = False
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
