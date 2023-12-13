@@ -1,5 +1,11 @@
 from django.db import models
 
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+
+import channels.layers
+from asgiref.sync import async_to_sync
+
 
 class Event(models.Model):
     event_class = models.CharField(
@@ -76,3 +82,10 @@ class Event(models.Model):
 
     def __str__(self) -> str:
         return self.event_staff
+
+
+@receiver(post_save, sender=Event)
+def send_message(sender, instance, **kwargs):
+    channels_ = channels.layers.get_channel_layer()
+    async_to_sync(channels_.group_send)("client", {"type": "receive", "text_data": {"data": "data"}})
+    
