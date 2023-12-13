@@ -37,5 +37,12 @@ class MonitorAdmin(admin.ModelAdmin):
 
 
     def index_view(self, request, *args, **kwargs):
-        return render(request, 'app_monitor/test.html')
+        id = request.META["HTTP_UPGRADE_INSECURE_REQUESTS"]
+        checkpoints_this_monitor = self.get_object(request, id).monitor_checkpoint.all()
+        list_name_checkpoints = [
+            checkpoint.name_checpoint for checkpoint in checkpoints_this_monitor
+        ]
+        return render(request, 'app_monitor/test.html', {
+            'list_name_checkpoints': list_name_checkpoints
+        })
     
