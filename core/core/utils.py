@@ -258,11 +258,10 @@ class BaseAdapterForModels:
                     event_type = '*',  event_flag = '*',
                     event_granted = self.__granted['granted'],
                     event_package = self.data_request,
+                    late = self.__late,
+                    event_late_status = self.__late_status,
+                    ENTRY_EXIT_queue_broken = self.__queue_broken,
                 )
-                obj.late = self.__late
-                obj.event_late_status = self.__late_status
-                obj.ENTRY_EXIT_queue_broken = self.__queue_broken
-                obj.save()
 
                 data = self.response_model(self.__granted, self.event_serial_num_controller)
                 return self.response(data=data, status_create=create)
