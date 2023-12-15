@@ -60,7 +60,8 @@
 
         ws.onmessage = function (event) {
             console.log('--------->', event)
-            // var ddata = JSON.parse(event.data)
+            var data = JSON.parse(event.data)
+            console.log('----data----->', data)
             // if (ddata) {
             //     var tr = document.createElement('tr');
 
