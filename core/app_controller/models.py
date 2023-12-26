@@ -35,14 +35,17 @@ class Controller(models.Model):
         '''
     )
     controller_activity = models.CharField(
-        verbose_name='Состояние контроллера', max_length=10,  default='0',
+        verbose_name='Состояние контроллера', max_length=10,  default='1',
         help_text='''
         Выбирите состояние контроллера и сохраните его <br>
         для включения или выключения.
         '''
     )
     controller_online = models.CharField(
-        verbose_name='Режимы контроллера', max_length=10, default='0/0'
+        verbose_name='Режимы контроллера', max_length=10, default='1'
+    )
+    controller_mode = models.CharField(
+        verbose_name='Режим контроллера', max_length=10, default='1'
     )
     checkpoint = models.ForeignKey(
         Checkpoint, on_delete=models.CASCADE, 
