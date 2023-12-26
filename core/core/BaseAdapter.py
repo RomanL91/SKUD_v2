@@ -14,6 +14,8 @@ from app_card_pass.models import CardPass
 
 from core.ServicesMultiProc import MultiprocessingDecorator
 
+from django.core.cache import cache 
+
 
 class BaseAdapterForModels:
     payload = None
@@ -92,6 +94,8 @@ class BaseAdapterForModels:
                     continue
                 elif operations_type == 'ping':
                     print('[==INFO==] ping')
+                    if  cache.get(self.data_request['sn']) != None:
+                        message_reply.extend(cache.get(self.data_request['sn']))
                     continue
                 elif operations_type == 'check_access':
                     print('[==INFO==] check_access')
