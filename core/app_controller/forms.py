@@ -9,14 +9,19 @@ CHOICES_CONTROLLER_ACTIVE = [
 ]
 
 CHOICES_CONTROLLER_ONLINE = [
-    ('0/0', 'Однофакторный режим'),
-    ('1/1', 'Двухфакторный режим'),
-    ('0/2', 'Свободный проход'),
-    ('0/1', 'Заблокирован'),
+    ('0', 'Оффлайн'),
+    ('1', 'Онлайн'),
+]
+
+CHOICES_CONTROLLER_MODE = [
+    ('0', 'Норма'),
+    ('1', 'Блокировка'),
+    ('2', 'Свободный проход'),
+    # ('3', 'Ожидание свободного прохода'),
 ]
 
 CHOICES_CONTROLLER_DIRECTION = [
-    ('ВХОД/ВЫХОД', 'Контроллер на ВХОД и ВЫХОД'),
+    ('0', 'Использовать нвстройки контроллера'),
     ('ВХОД', 'Контроллер на ВХОД'),
     ('ВЫХОД', 'Контроллер на ВЫХОД'),
 ]
@@ -27,6 +32,7 @@ class ControllerAdminForm(forms.ModelForm):
         widgets = {
             "controller_activity": forms.RadioSelect(choices=CHOICES_CONTROLLER_ACTIVE),
             "controller_online": forms.RadioSelect(choices=CHOICES_CONTROLLER_ONLINE),
+            "controller_mode": forms.RadioSelect(choices=CHOICES_CONTROLLER_MODE),
             "direction": forms.RadioSelect(choices=CHOICES_CONTROLLER_DIRECTION),
         }
         fields = '__all__'
