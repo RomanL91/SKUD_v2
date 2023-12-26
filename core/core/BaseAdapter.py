@@ -31,7 +31,7 @@ class BaseAdapterForModels:
     __card_pass: models = CardPass
 
     __header_resonse: dict = {"date": None, "interval": 10, "sn": None, "messages": None,}
-    set_mode: dict = {"id": 1, "operation": "set_mode", "mode": None}
+    set_mode: dict = {"id": 0, "operation": "set_mode", "mode": None}
     set_active: dict = {"id": 0, "operation": "set_active", "active": None, "online": None}
     add_card: dict = {
         "id": 0, "operation": "add_cards", "cards": [
@@ -72,16 +72,16 @@ class BaseAdapterForModels:
                     print('[==INFO==] power_on')
                     obj, create = self.__controller.objects.get_or_create(
                         type_controller = self.data_request['type'],
-                        serial_number = self.data_request['sn']
+                        serial_number = self.data_request['sn'],
+                        ip_adress = f"http://{messege['controller_ip']}"
                     )
                     if create:
                         continue
                     else:
                         self.set_active['active'] = int(obj.controller_activity)
-                        self.set_active['online'] = int(obj.controller_online.split('/')[0])
-                        self.set_mode['mode'] = int(obj.controller_online.split('/')[1])
+                        self.set_active['online'] = int(obj.controller_online)
+                        self.set_mode['mode'] = int(obj.controller_mode)
                         message_reply.extend([self.set_active, self.set_mode])
-                        self.payload = self.response_model(message_reply, obj.serial_number) #??? self.message_package
                         continue
                 elif operations_type == 'events':
                     print('[==INFO==] events')
@@ -98,7 +98,7 @@ class BaseAdapterForModels:
                     self.__granted['granted'] = 1 # это хард
                     message_reply.append(self.__granted)
                     continue
-            except:
+            except KeyError:
                 print('[==INFO==] msg success')
                 continue
         
@@ -134,3 +134,5 @@ class BaseAdapterForModels:
             ]
         return self.__header_resonse
     
+
+
