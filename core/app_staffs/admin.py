@@ -50,6 +50,11 @@ class StaffAdmin(admin.ModelAdmin):
         obj.save()
 
     
+    def delete_model(self, request, obj):
+        self.set_interception(obj, 'del_cards')
+        obj.delete()
+
+    
     def set_interception(self, obj, type_oper_card):
         oper_card = {
             "id": 0,
