@@ -6,6 +6,8 @@ from django.utils.html import format_html
 from app_tag.models import Tags, ColorField
 from app_staffs.models import Staff
 
+from django.core.cache import cache 
+
 
 @admin.register(Tags)
 class TagAdmin(admin.ModelAdmin):
@@ -40,5 +42,38 @@ class TagAdmin(admin.ModelAdmin):
                 staff.interception = obj.interception
                 objs_to_update.add(staff)
 
+        if change:
+            try:
+                form.data['interception']
+                for staff in objs_to_update:
+                    self.set_interception(staff, 'del_cards')
+            except KeyError:
+                for staff in objs_to_update:
+                    self.set_interception(staff, 'add_cards')
+
         Staff.objects.bulk_update(objs_to_update, ['interception'])
         obj.save()
+
+
+    def set_interception(self, obj, type_oper_card):
+        oper_card = {
+            "id": 0,
+            "operation": "del_cards", # del_cards | add_cards
+            "cards": [
+                # {"card":"000000A2BA93", "flags": 0, "tz": 255},
+            ]
+        }
+        staff_checkpoint_access_dany = obj.access_profile.checpoint.all()
+        staff_sn_controller_access_dany = []
+
+        for checkpoint in staff_checkpoint_access_dany:
+            staff_sn_controller_access_dany.extend(
+                checkpoint.controller_set.all()
+            )
+        staff_cards = [
+            {"card": card.pass_cart_hex_format, "flags": 0, "tz": 255} for card in obj.cardpass_set.all()
+        ]
+        oper_card['operation'] = type_oper_card
+        oper_card['cards'] = staff_cards
+        for contr in staff_sn_controller_access_dany:
+            cache.set(contr.serial_number, [oper_card], timeout=15)
