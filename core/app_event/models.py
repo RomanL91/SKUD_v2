@@ -8,9 +8,9 @@ from asgiref.sync import async_to_sync
 
 
 class Event(models.Model):
-    event_class = models.CharField(
-        verbose_name='Класс события', max_length=15,
-    )
+    # event_class = models.CharField(
+    #     verbose_name='Класс события', max_length=15,
+    # )
     event_date_time = models.DateTimeField(
         verbose_name='Дата и время события',
         # auto_created=
@@ -52,6 +52,7 @@ class Event(models.Model):
     )
     event_package = models.JSONField(
         verbose_name='Присланный пакет события', default=dict,
+         blank=True,
     )
     event_reason_granted = models.CharField(
         verbose_name='Тип решения по доступу', max_length=200,
