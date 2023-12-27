@@ -34,8 +34,7 @@ class AccessProfilrAdmin(admin.ModelAdmin):
                 else:
                     self.set_interception(staff, 'add_cards')
             Staff.objects.bulk_update(objs_to_update, ['interception'])
-            obj.save()
-            pass
+        obj.save()
 
 
     def set_interception(self, obj, type_oper_card):
