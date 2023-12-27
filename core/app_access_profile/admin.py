@@ -37,6 +37,14 @@ class AccessProfilrAdmin(admin.ModelAdmin):
         obj.save()
 
 
+    def delete_model(self, request, obj):
+        # TO DO!!!!!!!!!!!!!!!!
+        """
+        ПРИ УДАЛЕНИИ ПРОФИЛЯ ДОСТУПА, ЧТО ДЕЛАТЬ С КАРТАМИ ЭТОГО ПРОФИЛЯ??????
+        """
+        obj.delete()
+
+
     def set_interception(self, obj, type_oper_card):
         oper_card = {
             "id": 0,
