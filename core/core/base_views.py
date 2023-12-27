@@ -14,4 +14,4 @@ def controller_request_receiver_gateway(request):
     adapter = BaseAdapterForModels(request_adaptee=request)    
 
     adapter.get_input_data()
-    return adapter.adapt_and_save_2()
+    return adapter.adapt_and_save()
