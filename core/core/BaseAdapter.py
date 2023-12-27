@@ -98,8 +98,9 @@ class BaseAdapterForModels:
                     continue
                 elif operations_type == 'ping':
                     print('[==INFO==] ping')
-                    if  cache.get(self.data_request['sn']) != None:
+                    if cache.get(self.data_request['sn']) != None:
                         message_reply.extend(cache.get(self.data_request['sn']))
+                    cache.delete(self.data_request['sn'])
                     continue
                 elif operations_type == 'check_access':
                     print('[==INFO==] check_access')
