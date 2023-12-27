@@ -9,6 +9,8 @@ from app_card_pass.models import CardPass
 from app_card_pass.admin import CardPassInlines
 from app_photo_staff.admin import StaffPhotoInlines
 
+from django.core.cache import cache 
+
 # from app_staffs.lookups import StaffModelForm
 
 
@@ -32,6 +34,44 @@ class StaffAdmin(admin.ModelAdmin):
         ('Теги/Подгруппы', {'fields': (('tag',),), 'classes':('collapse',)}),
         ('Остальное о сотруднике', {'fields': (('home_adress', 'phone_number'),), 'classes':('collapse',)}),
     )
+
+    def save_model(self, request, obj, form, change):
+        if change:
+            try:
+                form.data['interception']
+                self.set_interception(obj, 'del_cards')
+                print(f'[==INFO==] Активирую перехват {obj}')
+            except KeyError:
+                print(f'[==INFO==] Возобновляю доступ для {obj}')
+                self.set_interception(obj, 'add_cards')
+        else:
+            self.set_interception(obj, 'add_cards')
+
+        obj.save()
+
+    
+    def set_interception(self, obj, type_oper_card):
+        oper_card = {
+            "id": 0,
+            "operation": "del_cards", # del_cards | add_cards
+            "cards": [
+                # {"card":"000000A2BA93", "flags": 0, "tz": 255},
+            ]
+        }
+        staff_checkpoint_access_dany = obj.access_profile.checpoint.all()
+        staff_sn_controller_access_dany = []
+
+        for checkpoint in staff_checkpoint_access_dany:
+            staff_sn_controller_access_dany.extend(
+                checkpoint.controller_set.all()
+            )
+        staff_cards = [
+            {"card": card.pass_cart_hex_format, "flags": 0, "tz": 255} for card in obj.cardpass_set.all()
+        ]
+        oper_card['operation'] = type_oper_card
+        oper_card['cards'] = staff_cards
+        for contr in staff_sn_controller_access_dany:
+            cache.set(contr.serial_number, [oper_card], timeout=15)
 
 
     def save_related(self, request, form, formsets, change):
