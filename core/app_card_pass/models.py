@@ -1,17 +1,15 @@
 import re
 
 from django.db import models
-from django.db.models import F
+from django.db.models.signals import post_save, post_delete, pre_save
 
-from app_staffs.models import Staff
+from django.dispatch import receiver
 
 from django.core.exceptions import ValidationError
 
 from django.utils.translation import gettext_lazy as _
 
-from django.db.models.signals import post_save, post_delete, pre_save
-
-from django.dispatch import receiver
+from app_staffs.models import Staff
 
 
 def pass_card_dec_format_valid(value):
@@ -97,57 +95,63 @@ class CardPass(models.Model):
         return self.pass_card_dec_format
     
 
-from core.utils import BaseAdapterForModels
-# from core.ServicesMultiProc import current_request
-# from django.contrib.auth.models import User
-# from django.contrib import messages
+from django.core.cache import cache 
+
+# @property как идея сделать это 
+def card_operations(obj, card, type_oper_card):
+    oper_card = {
+        "id": 0,
+        "operation": "del_cards", # del_cards | add_cards
+        "cards": [
+            # {"card":"000000A2BA93", "flags": 0, "tz": 255},
+        ]
+    }
+    staff_checkpoint_access_dany = obj.access_profile.checpoint.all()
+    staff_sn_controller_access_dany = []
+
+    for checkpoint in staff_checkpoint_access_dany:
+        staff_sn_controller_access_dany.extend(
+            checkpoint.controller_set.all()
+        )
+    staff_cards = [
+        {"card": card, "flags": 0, "tz": 255}]
+    oper_card['operation'] = type_oper_card
+    oper_card['cards'] = staff_cards
+    for contr in staff_sn_controller_access_dany:
+        value = cache.get(f'{contr.serial_number}_{type_oper_card}')
+        if value != None:
+            for el in value:
+                if 'cards' in el:
+                    el['cards'].append({"card": card, "flags": 0, "tz": 255})
+                    cache.set(f'{contr.serial_number}_{type_oper_card}', [el], timeout=15)
+        else:
+            cache.set(f'{contr.serial_number}_{type_oper_card}', [oper_card], timeout=15)
 
 
 # DRY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @receiver(pre_save, sender=CardPass)
 def pre_add_card(sender, instance, *args, **kwargs):
-    adapter = BaseAdapterForModels()
-    old_value = CardPass.objects.get(pk=instance.pk).pass_cart_hex_format
-    adapter.del_card['cards'][0]['card'] = old_value
-
-    controllers_for_filling_pass = []
-    checkpoints_for_filling_pass =  instance.staff.access_profile.checpoint.all()
-    for checkpoint in checkpoints_for_filling_pass:
-        controllers_for_filling_pass.extend(
-            checkpoint.controller_set.all())
-    for controller in controllers_for_filling_pass:
-        payload = adapter.response_model(adapter.del_card, controller.serial_number)
-        adapter.send_signal(controller.ip_adress, payload) # выгружать в фон мультипроцессинг или целери
-
+    try:
+        old_value_card = str(CardPass.objects.get(pk=instance.pk).pass_cart_hex_format)
+        print(f'[==INFO==] Изменение карты {instance} сотрудника {instance.staff}.')
+        print(f'[==INFO==] |-->> Удаление карты {old_value_card} с контроллеров.')
+        print(f'[==INFO==] |-->> Добавление карты {instance} в контроллеры.')
+        card_operations(instance.staff, old_value_card, 'del_cards')
+    except:
+        pass
 
 @receiver(post_save, sender=CardPass)
 def add_card(sender, instance, **kwargs):
+
     if instance.activate_card:
-        adapter = BaseAdapterForModels()
-        adapter.add_card['cards'][0]['card'] = instance.pass_cart_hex_format
-
-        controllers_for_filling_pass = []
-        checkpoints_for_filling_pass =  instance.staff.access_profile.checpoint.all()
-
-        for checkpoint in checkpoints_for_filling_pass:
-            controllers_for_filling_pass.extend(
-                checkpoint.controller_set.all())
-
-        for controller in controllers_for_filling_pass:
-            payload = adapter.response_model(adapter.add_card, controller.serial_number)
-            adapter.send_signal(controller.ip_adress, payload) # выгружать в фон мультипроцессинг или целери
+        print(f'[==INFO==] Добавление карты {instance} в контроллеры.')
+        card_operations(instance.staff, instance.pass_cart_hex_format, 'add_cards')
+    else:
+        print(f'[==INFO==] Деактивация карты {instance}.')
+        card_operations(instance.staff, instance.pass_cart_hex_format, 'del_cards')
 
 
 @receiver(post_delete, sender=CardPass)
 def delete_card(sender, instance, **kwargs):
-    adapter = BaseAdapterForModels()
-    adapter.del_card['cards'][0]['card'] = instance.pass_cart_hex_format
-
-    controllers_for_filling_pass = []
-    checkpoints_for_filling_pass =  instance.staff.access_profile.checpoint.all()
-    for checkpoint in checkpoints_for_filling_pass:
-        controllers_for_filling_pass.extend(
-            checkpoint.controller_set.all())
-    for controller in controllers_for_filling_pass:
-        payload = adapter.response_model(adapter.del_card, controller.serial_number)
-        adapter.send_signal(controller.ip_adress, payload) # выгружать в фон мультипроцессинг или целери
+    print(f'[==INFO==] Удаление карты {instance} с контроллеров.')
+    card_operations(instance.staff, instance.pass_cart_hex_format, 'del_cards')
