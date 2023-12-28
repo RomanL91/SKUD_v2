@@ -74,3 +74,67 @@ class Staff(models.Model):
 
     def __str__(self) -> str:
         return self.last_name
+    
+
+from django.db.models.signals import post_save, post_delete, pre_save
+from django.dispatch import receiver
+from django.core.cache import cache 
+
+
+def set_interception(obj, type_oper_card):
+    oper_card = {
+        "id": 0,
+        "operation": "del_cards", # del_cards | add_cards
+        "cards": [
+            # {"card":"000000A2BA93", "flags": 0, "tz": 255},
+        ]
+    }
+    staff_checkpoint_access_dany = obj.access_profile.checpoint.all()
+    staff_sn_controller_access_dany = []
+
+    for checkpoint in staff_checkpoint_access_dany:
+        staff_sn_controller_access_dany.extend(
+            checkpoint.controller_set.all()
+        )
+    
+    staff_cards = [
+        {"card": card.pass_cart_hex_format, "flags": 0, "tz": 255} 
+        for card in obj.cardpass_set.all() if card.activate_card
+    ]
+    oper_card['operation'] = type_oper_card
+    oper_card['cards'] = staff_cards
+    for contr in staff_sn_controller_access_dany:
+        cache.set(contr.serial_number, [oper_card], timeout=15)
+
+
+@receiver(pre_save, sender=Staff)
+def pre_add_staff(sender, instance, *args, **kwargs):
+    new_value_interception = instance.interception
+    try:
+        old_value_interception = Staff.objects.get(pk=instance.pk).interception
+    except:
+        print(f'[==INFO==] Создание нового сотрудника: {instance}')
+
+    if old_value_interception == new_value_interception:
+        print(f'[==INFO==] Без изменения статуса перехвата: {instance}')
+    else:
+        print(f'[==INFO==] Статус перехвата изменен: {instance}')
+        if new_value_interception:
+            print(f'[==INFO==] Активирован перехват {instance}')
+            set_interception(instance, 'del_cards')
+        else:
+            print(f'[==INFO==] Отмена перехвата {instance}')
+            set_interception(instance, 'add_cards')
+
+
+# @receiver(post_save, sender=Staff)
+# def add_staff(sender, instance, **kwargs):
+    # if instance.interception:
+        # set_interception(instance, 'del_cards')
+    # else:
+        # set_interception(instance, 'add_cards')
+
+
+@receiver(post_delete, sender=Staff)
+def delete_staff(sender, instance, **kwargs):
+    set_interception(instance, 'del_cards')
