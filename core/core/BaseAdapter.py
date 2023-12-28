@@ -100,7 +100,17 @@ class BaseAdapterForModels:
                     print('[==INFO==] ping')
                     if cache.get(self.data_request['sn']) != None:
                         message_reply.extend(cache.get(self.data_request['sn']))
+                    if cache.get(f'{self.data_request["sn"]}_add_cards') != None:
+                        add_cards = cache.get(f'{self.data_request["sn"]}_add_cards')
+                        print(f"add_cards --- {add_cards}")
+                        message_reply.extend(add_cards)
+                    if cache.get(f'{self.data_request["sn"]}_del_cards') != None:
+                        del_cards = cache.get(f'{self.data_request["sn"]}_del_cards')
+                        print(f"del_cards --- {del_cards}")
+                        message_reply.extend(del_cards)
                     cache.delete(self.data_request['sn'])
+                    cache.delete(f'{self.data_request["sn"]}_add_cards')
+                    cache.delete(f'{self.data_request["sn"]}_del_cards')
                     continue
                 elif operations_type == 'check_access':
                     print('[==INFO==] check_access')
