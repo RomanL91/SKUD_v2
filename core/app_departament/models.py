@@ -8,11 +8,12 @@ class Departament(models.Model):
     desc_dep = models.TextField(
         verbose_name='Описание', blank=True
     )
-    interception = models.BooleanField(
-        verbose_name='Перехват', default=False,
-        help_text='''Ограничит доступ на всех проходных/контроллерах сотрудников<br>
-        принадлежащие к данному Департаменту'''
-    )
+    # Убираем данный функционал на данный момент    
+    # interception = models.BooleanField(
+    #     verbose_name='Перехват', default=False,
+    #     help_text='''Ограничит доступ на всех проходных/контроллерах сотрудников<br>
+    #     принадлежащие к данному Департаменту'''
+    # )
 
 
     class Meta:

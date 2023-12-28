@@ -7,7 +7,7 @@ from app_staffs.models import Staff
 @admin.register(Departament)
 class DepartamentAdmin(admin.ModelAdmin):
     search_fields = ['name_departament']
-    list_display = ['name_departament', 'interception', 'desc_dep']
+    list_display = ['name_departament', 'desc_dep']
 
     def save_model(self, request, obj, form, change):
         objs_to_update = []
