@@ -102,11 +102,13 @@ class BaseAdapterForModels:
                         message_reply.extend(cache.get(self.data_request['sn']))
                     if cache.get(f'{self.data_request["sn"]}_add_cards') != None:
                         add_cards = cache.get(f'{self.data_request["sn"]}_add_cards')
-                        print(f"add_cards --- {add_cards}")
+                        print(f'Сообщение в очередь на контроллер: {self.data_request["sn"]}')
+                        print(f'| -->> Сообщение: {add_cards}')
                         message_reply.extend(add_cards)
                     if cache.get(f'{self.data_request["sn"]}_del_cards') != None:
                         del_cards = cache.get(f'{self.data_request["sn"]}_del_cards')
-                        print(f"del_cards --- {del_cards}")
+                        print(f'Сообщение в очередь на контроллер: {self.data_request["sn"]}')
+                        print(f'| -->> Сообщение: {add_cards}')
                         message_reply.extend(del_cards)
                     cache.delete(self.data_request['sn'])
                     cache.delete(f'{self.data_request["sn"]}_add_cards')
