@@ -108,7 +108,7 @@ class BaseAdapterForModels:
                     if cache.get(f'{self.data_request["sn"]}_del_cards') != None:
                         del_cards = cache.get(f'{self.data_request["sn"]}_del_cards')
                         print(f'Сообщение в очередь на контроллер: {self.data_request["sn"]}')
-                        print(f'| -->> Сообщение: {add_cards}')
+                        print(f'| -->> Сообщение: {del_cards}')
                         message_reply.extend(del_cards)
                     cache.delete(self.data_request['sn'])
                     cache.delete(f'{self.data_request["sn"]}_add_cards')

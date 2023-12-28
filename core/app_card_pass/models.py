@@ -133,10 +133,12 @@ def card_operations(obj, card, type_oper_card):
 def pre_add_card(sender, instance, *args, **kwargs):
     try:
         old_value_card = str(CardPass.objects.get(pk=instance.pk).pass_cart_hex_format)
-        print(f'[==INFO==] Изменение карты {instance} сотрудника {instance.staff}.')
-        print(f'[==INFO==] |-->> Удаление карты {old_value_card} с контроллеров.')
-        print(f'[==INFO==] |-->> Добавление карты {instance} в контроллеры.')
-        card_operations(instance.staff, old_value_card, 'del_cards')
+        new_value_card = instance.pass_cart_hex_format
+        if old_value_card != new_value_card or not instance.activate_card:
+            print(f'[==INFO==] Изменение карты {instance} сотрудника {instance.staff}.')
+            print(f'[==INFO==] |-->> Удаление карты {old_value_card} с контроллеров.')
+            print(f'[==INFO==] |-->> Добавление карты {instance} в контроллеры.')
+            card_operations(instance.staff, old_value_card, 'del_cards')
     except:
         pass
 
