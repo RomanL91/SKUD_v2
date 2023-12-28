@@ -140,9 +140,9 @@ def pre_add_card(sender, instance, *args, **kwargs):
     except:
         pass
 
+
 @receiver(post_save, sender=CardPass)
 def add_card(sender, instance, **kwargs):
-
     if instance.activate_card:
         print(f'[==INFO==] Добавление карты {instance} в контроллеры.')
         card_operations(instance.staff, instance.pass_cart_hex_format, 'add_cards')
